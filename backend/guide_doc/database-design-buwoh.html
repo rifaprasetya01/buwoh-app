@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dokumen Desain Database – Platform Buwoh</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1a1a2e; background: #f4f6fb; }
+
+  /* Cover */
+  .cover {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white; min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center; padding: 60px 40px;
+    page-break-after: always;
+  }
+  .cover .badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px; padding: 6px 18px; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 32px; }
+  .cover h1 { font-size: 42px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
+  .cover h1 span { color: #e94560; }
+  .cover .subtitle { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 48px; }
+  .cover .meta { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
+  .cover .meta-item { text-align: center; }
+  .cover .meta-item .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+  .cover .meta-item .value { font-size: 14px; font-weight: 600; }
+  .cover .divider { width: 60px; height: 3px; background: #e94560; margin: 32px auto; border-radius: 2px; }
+
+  /* Content */
+  .content { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+
+  /* TOC */
+  .toc { background: white; border-radius: 12px; padding: 32px; margin-bottom: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+  .toc h2 { font-size: 18px; font-weight: 700; color: #0f3460; margin-bottom: 20px;
+    padding-bottom: 12px; border-bottom: 2px solid #e94560; }
+  .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .toc-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+    border-radius: 6px; transition: background 0.2s; }
+  .toc-item:hover { background: #f4f6fb; }
+  .toc-num { background: #0f3460; color: white; width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+    flex-shrink: 0; }
+  .toc-text { font-size: 13px; color: #333; }
+
+  /* Sections */
+  .section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+  .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px;
+    padding-bottom: 16px; border-bottom: 2px solid #f0f0f5; }
+  .section-num { background: linear-gradient(135deg, #0f3460, #16213e); color: white;
+    width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center;
+    justify-content: center; font-size: 16px; font-weight: 800; flex-shrink: 0; }
+  .section-title { font-size: 20px; font-weight: 700; color: #0f3460; }
+  .section-sub { font-size: 12px; color: #888; margin-top: 2px; }
+
+  p { line-height: 1.7; color: #444; margin-bottom: 12px; }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead tr { background: linear-gradient(135deg, #0f3460, #16213e); color: white; }
+  thead th { padding: 12px 14px; text-align: left; font-weight: 600; letter-spacing: 0.3px; }
+  tbody tr { border-bottom: 1px solid #f0f0f5; }
+  tbody tr:hover { background: #f8f9fe; }
+  tbody td { padding: 10px 14px; vertical-align: top; }
+  .td-name { font-weight: 700; color: #0f3460; font-family: 'Courier New', monospace; white-space: nowrap; }
+  .td-type { font-family: 'Courier New', monospace; color: #e94560; font-size: 11px; white-space: nowrap; }
+  .td-pk { background: #fff3e0; color: #e65100; font-weight: 700; border-radius: 4px;
+    padding: 1px 6px; font-size: 10px; white-space: nowrap; }
+  .td-fk { background: #e8f5e9; color: #2e7d32; font-weight: 700; border-radius: 4px;
+    padding: 1px 6px; font-size: 10px; white-space: nowrap; }
+  .td-uq { background: #e3f2fd; color: #1565c0; font-weight: 700; border-radius: 4px;
+    padding: 1px 6px; font-size: 10px; white-space: nowrap; }
+  .constraint-tag { display: inline-block; margin: 1px; }
+
+  /* Table title */
+  .table-title { font-size: 15px; font-weight: 700; color: #0f3460; margin: 24px 0 8px;
+    display: flex; align-items: center; gap: 8px; }
+  .table-title::before { content: ''; width: 4px; height: 18px; background: #e94560;
+    border-radius: 2px; display: inline-block; }
+  .table-desc { font-size: 12px; color: #777; margin-bottom: 10px; }
+
+  /* ER Diagram */
+  .er-box { background: #f8f9fe; border: 1px solid #e0e4f0; border-radius: 10px;
+    padding: 20px; margin: 12px 0; }
+  .er-entity { background: linear-gradient(135deg, #0f3460, #16213e); color: white;
+    border-radius: 8px; padding: 10px 16px; margin: 8px 0; display: inline-block;
+    font-weight: 700; font-size: 13px; letter-spacing: 0.5px; }
+  .er-rel { display: flex; align-items: center; gap: 10px; margin: 6px 0 6px 20px;
+    font-size: 12px; color: #555; }
+  .er-rel .arrow { color: #e94560; font-weight: 700; }
+  .er-rel .cardinality { background: #fff3e0; color: #e65100; border-radius: 4px;
+    padding: 1px 8px; font-size: 11px; font-weight: 700; }
+  .er-rel .rel-name { font-style: italic; color: #888; }
+
+  /* Flow */
+  .flow { display: flex; flex-wrap: wrap; gap: 0; margin: 16px 0; align-items: center; }
+  .flow-step { background: #0f3460; color: white; padding: 10px 16px; border-radius: 8px;
+    font-size: 12px; font-weight: 600; text-align: center; min-width: 120px; }
+  .flow-arrow { color: #e94560; font-size: 18px; font-weight: 900; padding: 0 6px; }
+
+  /* Info boxes */
+  .info-box { border-left: 4px solid #0f3460; background: #f0f4ff; padding: 14px 16px;
+    border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 12px; color: #333; line-height: 1.6; }
+  .warn-box { border-left: 4px solid #e94560; background: #fff0f3; padding: 14px 16px;
+    border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 12px; color: #333; line-height: 1.6; }
+  .success-box { border-left: 4px solid #2e7d32; background: #f0fff4; padding: 14px 16px;
+    border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 12px; color: #333; line-height: 1.6; }
+  .box-title { font-weight: 700; margin-bottom: 6px; font-size: 13px; }
+
+  /* Index list */
+  .index-list { list-style: none; }
+  .index-list li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0;
+    border-bottom: 1px solid #f0f0f5; font-size: 12px; }
+  .index-list li:last-child { border-bottom: none; }
+  .idx-tag { background: #e3f2fd; color: #1565c0; border-radius: 4px; padding: 2px 8px;
+    font-size: 10px; font-weight: 700; white-space: nowrap; flex-shrink: 0; font-family: monospace; }
+
+  /* SQL block */
+  pre { background: #1a1a2e; color: #a8d8a8; border-radius: 8px; padding: 20px;
+    font-family: 'Courier New', monospace; font-size: 11.5px; line-height: 1.7;
+    overflow-x: auto; margin: 12px 0; }
+  .sql-comment { color: #6a9955; }
+  .sql-kw { color: #569cd6; font-weight: bold; }
+  .sql-type { color: #4ec9b0; }
+  .sql-str { color: #ce9178; }
+  .sql-fn { color: #dcdcaa; }
+  .sql-num { color: #b5cea8; }
+
+  /* Grid layouts */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+  .card { background: #f8f9fe; border: 1px solid #e0e4f0; border-radius: 8px; padding: 16px; }
+  .card-title { font-weight: 700; color: #0f3460; font-size: 13px; margin-bottom: 10px; }
+  .card ul { list-style: none; }
+  .card ul li { font-size: 12px; color: #555; padding: 3px 0;
+    padding-left: 14px; position: relative; }
+  .card ul li::before { content: '→'; position: absolute; left: 0; color: #e94560; font-size: 11px; }
+
+  /* Status chips */
+  .chip { display: inline-block; border-radius: 12px; padding: 2px 10px; font-size: 10px;
+    font-weight: 700; margin: 2px; }
+  .chip-blue { background: #e3f2fd; color: #1565c0; }
+  .chip-red { background: #ffebee; color: #c62828; }
+  .chip-green { background: #e8f5e9; color: #2e7d32; }
+  .chip-orange { background: #fff3e0; color: #e65100; }
+  .chip-purple { background: #f3e5f5; color: #6a1b9a; }
+
+  /* Footer */
+  .doc-footer { text-align: center; padding: 32px; color: #aaa; font-size: 11px; }
+
+  @media print {
+    body { background: white; }
+    .cover { min-height: auto; padding: 80px 40px; }
+    .section { box-shadow: none; border: 1px solid #eee; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ COVER ═══════════════════ -->
+<div class="cover">
+  <div class="badge">Database Design Document</div>
+  <h1>Platform <span>Buwoh</span></h1>
+  <div class="subtitle">Rancangan & Desain Database Sistem Informasi Buwohan</div>
+  <div class="divider"></div>
+  <div class="meta">
+    <div class="meta-item">
+      <div class="label">Versi Dokumen</div>
+      <div class="value">v1.0.0</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">Tanggal</div>
+      <div class="value">April 2026</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">Tipe Database</div>
+      <div class="value">Relasional (SQL)</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">Status</div>
+      <div class="value">Draft Final</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════ TOC ═══════════════════ -->
+<div class="toc">
+  <h2>Daftar Isi</h2>
+  <div class="toc-grid">
+    <div class="toc-item"><div class="toc-num">1</div><div class="toc-text">Ringkasan Sistem</div></div>
+    <div class="toc-item"><div class="toc-num">2</div><div class="toc-text">Entitas & Relasi (ERD Overview)</div></div>
+    <div class="toc-item"><div class="toc-num">3</div><div class="toc-text">Skema Tabel Lengkap</div></div>
+    <div class="toc-item"><div class="toc-num">4</div><div class="toc-text">Alur Bisnis & State Diagram</div></div>
+    <div class="toc-item"><div class="toc-num">5</div><div class="toc-text">Business Rules & Constraint</div></div>
+    <div class="toc-item"><div class="toc-num">6</div><div class="toc-text">Indeks & Optimasi Query</div></div>
+    <div class="toc-item"><div class="toc-num">7</div><div class="toc-text">Contoh Query Utama</div></div>
+    <div class="toc-item"><div class="toc-num">8</div><div class="toc-text">Catatan & Rekomendasi</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SECTION 1 ═══════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <div>
+      <div class="section-title">Ringkasan Sistem</div>
+      <div class="section-sub">System Overview & Context</div>
+    </div>
+  </div>
+
+  <p><strong>Platform Buwoh</strong> adalah aplikasi berbasis web/mobile yang memfasilitasi tradisi buwoh (gotong-royong membawa bawaan ke hajatan) secara digital. Platform ini menghubungkan pemilik acara (hajatan, khitan, pernikahan) dengan tamu yang ingin berpartisipasi dengan membawa bawaan.</p>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">🎯 Scope MVP</div>
+      <ul>
+        <li>Registrasi & autentikasi user</li>
+        <li>Manajemen acara (CRUD)</li>
+        <li>Pengajuan & persetujuan tamu</li>
+        <li>Pencatatan detail bawaan tamu</li>
+        <li>Verifikasi kehadiran di lokasi</li>
+        <li>Sistem notifikasi balas budi</li>
+        <li>Dashboard pemilik acara</li>
+        <li>Riwayat acara yang dihadiri</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">👥 Peran User</div>
+      <ul>
+        <li>User sebagai <strong>Pemilik Acara</strong></li>
+        <li>User sebagai <strong>Calon Tamu</strong></li>
+        <li>Satu user bisa memiliki kedua peran</li>
+        <li>Tidak ada role admin terpisah (MVP)</li>
+        <li>Pemilik acara bisa buat rekomendasi bawaan</li>
+        <li>Pemilik acara bisa verifikasi kehadiran</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <div class="box-title">📌 Keputusan Desain Awal</div>
+    Database menggunakan pendekatan <strong>RDBMS (Relational Database)</strong> seperti PostgreSQL atau MySQL. Dipilih karena data memiliki relasi yang kuat antar entitas, memerlukan transaksi yang konsisten (ACID), dan skala kecil-menengah tidak memerlukan NoSQL.
+  </div>
+</div>
+
+<!-- ═══════════════════ SECTION 2 ═══════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <div>
+      <div class="section-title">Entitas & Relasi (ERD Overview)</div>
+      <div class="section-sub">Entity Relationship Diagram – Tekstual</div>
+    </div>
+  </div>
+
+  <p>Sistem terdiri dari <strong>9 tabel utama</strong> yang saling berelasi. Berikut gambaran lengkap relasi antar entitas:</p>
+
+  <div class="er-box">
+
+    <div class="er-entity">users</div>
+    <div class="er-rel"><span class="arrow">↳</span> <span class="cardinality">1 : N</span> <span class="rel-name">membuat</span> → <strong>events</strong> (satu user bisa punya banyak acara, tidak boleh bertabrakan waktu)</div>
+    <div class="er-rel"><span class="arrow">↳</span> <span class="cardinality">1 : N</span> <span class="rel-name">mengajukan</span> → <strong>event_guests</strong> (satu user bisa jadi tamu di banyak acara)</div>
+    <div class="er-rel"><span class="arrow">↳</span> <span class="cardinality">1 : N</span> <span class="rel-name">menerima</span> → <strong>notifications</strong></div>
+
+    <br>
+    <div class="er-entity">events</div>
+    <div class="er-rel"><span class="arrow">↳</span> <span class="cardinality">N : 1</span> <span class="rel-name">bertipe</span> → <strong>event_categories</strong></div>
+    <div class="er-rel"><span class="arrow">↳</span> <span class="cardinality">1 : N</span> <span class="rel-name">memiliki</span> → <strong>event_guests</strong> (daftar tamu yang mengajukan)</div>
+    <div class="er-rel"><span class="arrow">↳</span> <span class="cardinality">1 : N</span> <span class="rel-name">memiliki</span> → <strong>event_gift_recommendations</strong> (rekomendasi bawaan dari pemilik)</div>
+
+    <br>
+    <div class="er-entity">event_guests</div>
+    <div class="er-rel"><span class="arrow">↳</span> <span class="cardinality">1 : N</span> <span class="rel-name">memiliki</span> → <strong>guest_gifts</strong> (detail bawaan yang dibawa tamu)</div>
+
+    <br>
+    <div class="er-entity">guest_gifts</div>
+    <div class="er-rel"><span class="arrow">↳</span> <span class="cardinality">N : 1</span> <span class="rel-name">dikategorikan ke</span> → <strong>gift_categories</strong> (beras, uang, gula, dll)</div>
+
+    <br>
+    <div class="er-entity">event_gift_recommendations</div>
+    <div class="er-rel"><span class="arrow">↳</span> <span class="cardinality">N : 1</span> <span class="rel-name">merujuk ke</span> → <strong>gift_categories</strong></div>
+
+    <br>
+    <div class="er-entity">notifications</div>
+    <div class="er-rel"><span class="arrow">↳</span> <span class="cardinality">N : 1</span> <span class="rel-name">terkait</span> → <strong>events</strong> (notifikasi balas budi terkait acara tertentu)</div>
+    <div class="er-rel"><span class="arrow">↳</span> <span class="cardinality">N : 1</span> <span class="rel-name">ditujukan ke</span> → <strong>users</strong></div>
+
+  </div>
+
+  <div class="info-box">
+    <div class="box-title">💡 Tabel yang Ditambahkan vs Diusulkan Klien</div>
+    Klien mengusulkan: users, events, buwoh/buwohan, kategori buwoh, kategori acara.<br><br>
+    <strong>Perubahan & penambahan:</strong><br>
+    ✅ "Buwohan" dipecah menjadi <code>event_guests</code> (data tamu) dan <code>guest_gifts</code> (detail bawaan) — agar satu tamu bisa membawa lebih dari satu jenis bawaan.<br>
+    ✅ Ditambahkan tabel <code>event_gift_recommendations</code> untuk fitur rekomendasi bawaan dari pemilik acara.<br>
+    ✅ Ditambahkan tabel <code>notifications</code> untuk fitur balas budi.<br>
+    ✅ Semua tabel dilengkapi timestamp <code>created_at</code> dan <code>updated_at</code> untuk audit trail.
+  </div>
+</div>
+
+<!-- ═══════════════════ SECTION 3 ═══════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <div>
+      <div class="section-title">Skema Tabel Lengkap</div>
+      <div class="section-sub">Full Table Schema – Kolom, Tipe Data, Constraint</div>
+    </div>
+  </div>
+
+  <!-- ── TABLE 1: users ── -->
+  <div class="table-title">Tabel 1: <code>users</code></div>
+  <div class="table-desc">Menyimpan data akun pengguna platform. Satu user bisa berperan sebagai pemilik acara maupun tamu.</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Kolom</th><th>Tipe Data</th><th>Constraint</th><th>Keterangan</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="td-name">id</td><td class="td-type">BIGINT UNSIGNED</td><td><span class="td-pk constraint-tag">PK</span> AUTO_INCREMENT</td><td>ID unik user</td></tr>
+        <tr><td class="td-name">name</td><td class="td-type">VARCHAR(100)</td><td>NOT NULL</td><td>Nama lengkap user</td></tr>
+        <tr><td class="td-name">email</td><td class="td-type">VARCHAR(150)</td><td>NOT NULL <span class="td-uq constraint-tag">UNIQUE</span></td><td>Email untuk login</td></tr>
+        <tr><td class="td-name">phone_number</td><td class="td-type">VARCHAR(20)</td><td><span class="td-uq constraint-tag">UNIQUE</span></td><td>Nomor HP (opsional, bisa untuk verifikasi)</td></tr>
+        <tr><td class="td-name">password_hash</td><td class="td-type">VARCHAR(255)</td><td>NOT NULL</td><td>Password yang sudah di-hash (bcrypt/argon2)</td></tr>
+        <tr><td class="td-name">profile_photo_url</td><td class="td-type">VARCHAR(500)</td><td>NULL</td><td>URL foto profil</td></tr>
+        <tr><td class="td-name">address</td><td class="td-type">TEXT</td><td>NULL</td><td>Alamat domisili user</td></tr>
+        <tr><td class="td-name">email_verified_at</td><td class="td-type">TIMESTAMP</td><td>NULL</td><td>Waktu verifikasi email. NULL = belum verifikasi</td></tr>
+        <tr><td class="td-name">is_active</td><td class="td-type">TINYINT(1)</td><td>NOT NULL DEFAULT 1</td><td>Status akun aktif/nonaktif</td></tr>
+        <tr><td class="td-name">created_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Waktu registrasi</td></tr>
+        <tr><td class="td-name">updated_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Waktu update terakhir</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── TABLE 2: event_categories ── -->
+  <div class="table-title">Tabel 2: <code>event_categories</code></div>
+  <div class="table-desc">Menyimpan jenis-jenis acara yang tersedia, misalnya: Pernikahan, Khitan, Syukuran, dll.</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Kolom</th><th>Tipe Data</th><th>Constraint</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">id</td><td class="td-type">INT UNSIGNED</td><td><span class="td-pk constraint-tag">PK</span> AUTO_INCREMENT</td><td>ID kategori acara</td></tr>
+        <tr><td class="td-name">name</td><td class="td-type">VARCHAR(100)</td><td>NOT NULL <span class="td-uq constraint-tag">UNIQUE</span></td><td>Nama kategori (Pernikahan, Khitan, Syukuran, dll)</td></tr>
+        <tr><td class="td-name">icon_url</td><td class="td-type">VARCHAR(500)</td><td>NULL</td><td>Ikon kategori untuk tampilan UI</td></tr>
+        <tr><td class="td-name">created_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Waktu dibuat</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── TABLE 3: events ── -->
+  <div class="table-title">Tabel 3: <code>events</code></div>
+  <div class="table-desc">Tabel utama untuk menyimpan data acara yang dibuat oleh user. Satu user tidak boleh memiliki dua acara yang waktunya bertabrakan.</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Kolom</th><th>Tipe Data</th><th>Constraint</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">id</td><td class="td-type">BIGINT UNSIGNED</td><td><span class="td-pk constraint-tag">PK</span> AUTO_INCREMENT</td><td>ID unik acara</td></tr>
+        <tr><td class="td-name">user_id</td><td class="td-type">BIGINT UNSIGNED</td><td>NOT NULL <span class="td-fk constraint-tag">FK → users.id</span></td><td>Pemilik acara</td></tr>
+        <tr><td class="td-name">event_category_id</td><td class="td-type">INT UNSIGNED</td><td>NOT NULL <span class="td-fk constraint-tag">FK → event_categories.id</span></td><td>Jenis acara</td></tr>
+        <tr><td class="td-name">title</td><td class="td-type">VARCHAR(200)</td><td>NOT NULL</td><td>Judul/nama acara</td></tr>
+        <tr><td class="td-name">description</td><td class="td-type">TEXT</td><td>NULL</td><td>Deskripsi acara</td></tr>
+        <tr><td class="td-name">location_name</td><td class="td-type">VARCHAR(300)</td><td>NOT NULL</td><td>Nama tempat pelaksanaan</td></tr>
+        <tr><td class="td-name">location_address</td><td class="td-type">TEXT</td><td>NOT NULL</td><td>Alamat lengkap lokasi acara</td></tr>
+        <tr><td class="td-name">location_lat</td><td class="td-type">DECIMAL(10,8)</td><td>NULL</td><td>Latitude (untuk peta/navigasi)</td></tr>
+        <tr><td class="td-name">location_lng</td><td class="td-type">DECIMAL(11,8)</td><td>NULL</td><td>Longitude (untuk peta/navigasi)</td></tr>
+        <tr><td class="td-name">start_datetime</td><td class="td-type">DATETIME</td><td>NOT NULL</td><td>Waktu mulai acara</td></tr>
+        <tr><td class="td-name">end_datetime</td><td class="td-type">DATETIME</td><td>NOT NULL</td><td>Waktu selesai acara</td></tr>
+        <tr><td class="td-name">max_guests</td><td class="td-type">INT UNSIGNED</td><td>NULL</td><td>Batas maksimal tamu. NULL = tidak dibatasi</td></tr>
+        <tr><td class="td-name">cover_image_url</td><td class="td-type">VARCHAR(500)</td><td>NULL</td><td>Foto sampul acara</td></tr>
+        <tr><td class="td-name">status</td><td class="td-type">ENUM</td><td>NOT NULL DEFAULT 'draft'</td><td>'draft' | 'published' | 'ongoing' | 'completed' | 'cancelled'</td></tr>
+        <tr><td class="td-name">created_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Waktu pembuatan</td></tr>
+        <tr><td class="td-name">updated_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Waktu update terakhir</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="warn-box">
+    <div class="box-title">⚠️ Business Rule – Anti-Tabrakan Jadwal</div>
+    Validasi <strong>tidak boleh dilakukan hanya di level database constraint</strong> karena SQL standar tidak mendukung range overlap check secara langsung. Validasi wajib dilakukan di <strong>application layer</strong> sebelum INSERT/UPDATE, dengan query: <code>WHERE user_id = ? AND status != 'cancelled' AND start_datetime &lt; ? AND end_datetime &gt; ?</code>. Lakukan juga pengecekan ini sebelum user bisa mempublish acara (status: draft → published).
+  </div>
+
+  <!-- ── TABLE 4: event_gift_recommendations ── -->
+  <div class="table-title">Tabel 4: <code>event_gift_recommendations</code></div>
+  <div class="table-desc">Daftar rekomendasi barang bawaan yang dibuat pemilik acara. Tamu dapat merujuk ini saat mengisi form bawaan.</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Kolom</th><th>Tipe Data</th><th>Constraint</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">id</td><td class="td-type">BIGINT UNSIGNED</td><td><span class="td-pk constraint-tag">PK</span> AUTO_INCREMENT</td><td>ID rekomendasi</td></tr>
+        <tr><td class="td-name">event_id</td><td class="td-type">BIGINT UNSIGNED</td><td>NOT NULL <span class="td-fk constraint-tag">FK → events.id</span></td><td>Acara yang membuat rekomendasi ini</td></tr>
+        <tr><td class="td-name">gift_category_id</td><td class="td-type">INT UNSIGNED</td><td>NOT NULL <span class="td-fk constraint-tag">FK → gift_categories.id</span></td><td>Jenis bawaan yang direkomendasikan</td></tr>
+        <tr><td class="td-name">suggested_quantity</td><td class="td-type">DECIMAL(10,2)</td><td>NULL</td><td>Jumlah yang disarankan (misal: 5 kg beras)</td></tr>
+        <tr><td class="td-name">notes</td><td class="td-type">VARCHAR(300)</td><td>NULL</td><td>Catatan tambahan dari pemilik acara</td></tr>
+        <tr><td class="td-name">created_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Waktu dibuat</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── TABLE 5: gift_categories ── -->
+  <div class="table-title">Tabel 5: <code>gift_categories</code></div>
+  <div class="table-desc">Master data kategori jenis bawaan beserta satuannya. Contoh: Beras (kg), Uang (Rp), Gula (kg), Minyak (liter).</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Kolom</th><th>Tipe Data</th><th>Constraint</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">id</td><td class="td-type">INT UNSIGNED</td><td><span class="td-pk constraint-tag">PK</span> AUTO_INCREMENT</td><td>ID kategori bawaan</td></tr>
+        <tr><td class="td-name">name</td><td class="td-type">VARCHAR(100)</td><td>NOT NULL <span class="td-uq constraint-tag">UNIQUE</span></td><td>Nama jenis bawaan (Beras, Uang, Gula, dll)</td></tr>
+        <tr><td class="td-name">unit</td><td class="td-type">VARCHAR(20)</td><td>NOT NULL</td><td>Satuan (kg, Rp, liter, pcs, dll)</td></tr>
+        <tr><td class="td-name">icon_url</td><td class="td-type">VARCHAR(500)</td><td>NULL</td><td>Ikon untuk tampilan UI</td></tr>
+        <tr><td class="td-name">is_monetary</td><td class="td-type">TINYINT(1)</td><td>NOT NULL DEFAULT 0</td><td>Flag apakah ini jenis uang/nominal (untuk keperluan agregasi)</td></tr>
+        <tr><td class="td-name">created_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Waktu dibuat</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── TABLE 6: event_guests ── -->
+  <div class="table-title">Tabel 6: <code>event_guests</code></div>
+  <div class="table-desc">Tabel inti untuk mencatat pengajuan tamu ke sebuah acara. Setiap baris mewakili satu pengajuan dari satu user ke satu acara.</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Kolom</th><th>Tipe Data</th><th>Constraint</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">id</td><td class="td-type">BIGINT UNSIGNED</td><td><span class="td-pk constraint-tag">PK</span> AUTO_INCREMENT</td><td>ID pengajuan tamu</td></tr>
+        <tr><td class="td-name">event_id</td><td class="td-type">BIGINT UNSIGNED</td><td>NOT NULL <span class="td-fk constraint-tag">FK → events.id</span></td><td>Acara yang dituju</td></tr>
+        <tr><td class="td-name">user_id</td><td class="td-type">BIGINT UNSIGNED</td><td>NOT NULL <span class="td-fk constraint-tag">FK → users.id</span></td><td>User yang mengajukan diri sebagai tamu</td></tr>
+        <tr><td class="td-name">application_status</td><td class="td-type">ENUM</td><td>NOT NULL DEFAULT 'pending'</td><td>'pending' | 'accepted' | 'rejected'</td></tr>
+        <tr><td class="td-name">attendance_status</td><td class="td-type">ENUM</td><td>NOT NULL DEFAULT 'not_verified'</td><td>'not_verified' | 'present' | 'absent' — diisi pemilik acara saat hari-H</td></tr>
+        <tr><td class="td-name">gift_verified</td><td class="td-type">TINYINT(1)</td><td>NOT NULL DEFAULT 0</td><td>Apakah bawaan sudah diverifikasi kesesuaiannya (pemilik acara)</td></tr>
+        <tr><td class="td-name">rejection_reason</td><td class="td-type">VARCHAR(300)</td><td>NULL</td><td>Alasan penolakan (jika ditolak)</td></tr>
+        <tr><td class="td-name">notes_from_guest</td><td class="td-type">TEXT</td><td>NULL</td><td>Pesan/catatan dari tamu ke pemilik acara</td></tr>
+        <tr><td class="td-name">applied_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Waktu pengajuan</td></tr>
+        <tr><td class="td-name">responded_at</td><td class="td-type">TIMESTAMP</td><td>NULL</td><td>Waktu pemilik merespons (terima/tolak)</td></tr>
+        <tr><td class="td-name">verified_at</td><td class="td-type">TIMESTAMP</td><td>NULL</td><td>Waktu verifikasi kehadiran di lokasi</td></tr>
+        <tr><td class="td-name">updated_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Update terakhir</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="success-box">
+    <div class="box-title">✅ UNIQUE Constraint Penting</div>
+    Tambahkan composite unique key: <code>UNIQUE KEY uq_event_user (event_id, user_id)</code> — untuk memastikan satu user hanya bisa mengajukan sekali ke acara yang sama.
+  </div>
+
+  <!-- ── TABLE 7: guest_gifts ── -->
+  <div class="table-title">Tabel 7: <code>guest_gifts</code></div>
+  <div class="table-desc">Detail bawaan yang akan dibawa oleh tamu. Satu tamu bisa membawa lebih dari satu jenis bawaan ke satu acara.</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Kolom</th><th>Tipe Data</th><th>Constraint</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">id</td><td class="td-type">BIGINT UNSIGNED</td><td><span class="td-pk constraint-tag">PK</span> AUTO_INCREMENT</td><td>ID bawaan</td></tr>
+        <tr><td class="td-name">event_guest_id</td><td class="td-type">BIGINT UNSIGNED</td><td>NOT NULL <span class="td-fk constraint-tag">FK → event_guests.id</span></td><td>Pengajuan tamu yang membawa ini</td></tr>
+        <tr><td class="td-name">gift_category_id</td><td class="td-type">INT UNSIGNED</td><td>NOT NULL <span class="td-fk constraint-tag">FK → gift_categories.id</span></td><td>Jenis bawaan</td></tr>
+        <tr><td class="td-name">quantity</td><td class="td-type">DECIMAL(10,2)</td><td>NOT NULL</td><td>Jumlah/nominal bawaan (misal: 5 untuk 5 kg beras)</td></tr>
+        <tr><td class="td-name">notes</td><td class="td-type">VARCHAR(300)</td><td>NULL</td><td>Keterangan tambahan dari tamu (misal: merek beras tertentu)</td></tr>
+        <tr><td class="td-name">created_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Waktu input</td></tr>
+        <tr><td class="td-name">updated_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Waktu update</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── TABLE 8: notifications ── -->
+  <div class="table-title">Tabel 8: <code>notifications</code></div>
+  <div class="table-desc">Sistem notifikasi, termasuk notifikasi balas budi ketika user yang pernah jadi tamu di acara kita membuat acara baru.</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Kolom</th><th>Tipe Data</th><th>Constraint</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">id</td><td class="td-type">BIGINT UNSIGNED</td><td><span class="td-pk constraint-tag">PK</span> AUTO_INCREMENT</td><td>ID notifikasi</td></tr>
+        <tr><td class="td-name">recipient_user_id</td><td class="td-type">BIGINT UNSIGNED</td><td>NOT NULL <span class="td-fk constraint-tag">FK → users.id</span></td><td>User penerima notifikasi</td></tr>
+        <tr><td class="td-name">sender_user_id</td><td class="td-type">BIGINT UNSIGNED</td><td>NULL <span class="td-fk constraint-tag">FK → users.id</span></td><td>User pemicu notifikasi (NULL = notifikasi sistem)</td></tr>
+        <tr><td class="td-name">related_event_id</td><td class="td-type">BIGINT UNSIGNED</td><td>NULL <span class="td-fk constraint-tag">FK → events.id</span></td><td>Acara yang berkaitan (acara baru milik sender)</td></tr>
+        <tr><td class="td-name">type</td><td class="td-type">ENUM</td><td>NOT NULL</td><td>'balas_budi' | 'application_accepted' | 'application_rejected' | 'new_applicant' | 'attendance_verified'</td></tr>
+        <tr><td class="td-name">title</td><td class="td-type">VARCHAR(200)</td><td>NOT NULL</td><td>Judul notifikasi</td></tr>
+        <tr><td class="td-name">message</td><td class="td-type">TEXT</td><td>NOT NULL</td><td>Isi pesan notifikasi</td></tr>
+        <tr><td class="td-name">is_read</td><td class="td-type">TINYINT(1)</td><td>NOT NULL DEFAULT 0</td><td>Status sudah dibaca atau belum</td></tr>
+        <tr><td class="td-name">created_at</td><td class="td-type">TIMESTAMP</td><td>NOT NULL DEFAULT NOW()</td><td>Waktu notifikasi dibuat</td></tr>
+        <tr><td class="td-name">read_at</td><td class="td-type">TIMESTAMP</td><td>NULL</td><td>Waktu notifikasi dibaca</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ═══════════════════ SECTION 4 ═══════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <div>
+      <div class="section-title">Alur Bisnis & State Diagram</div>
+      <div class="section-sub">Business Flow & State Transitions</div>
+    </div>
+  </div>
+
+  <p><strong>Alur Pengajuan Tamu (Proses Utama)</strong></p>
+  <div class="flow">
+    <div class="flow-step">User B lihat acara</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Isi form bawaan (guest_gifts)</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Submit pengajuan<br><small>(status: pending)</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">User A terima/tolak</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Hari-H: verifikasi hadir</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Cek kesesuaian bawaan</div>
+  </div>
+
+  <br>
+  <p><strong>State Diagram: <code>events.status</code></strong></p>
+  <div class="flow" style="flex-wrap:wrap; gap:6px; align-items:center;">
+    <span class="chip chip-blue">draft</span>
+    <span style="color:#e94560; font-weight:700;">→ publish →</span>
+    <span class="chip chip-purple">published</span>
+    <span style="color:#e94560; font-weight:700;">→ hari-H →</span>
+    <span class="chip chip-orange">ongoing</span>
+    <span style="color:#e94560; font-weight:700;">→ selesai →</span>
+    <span class="chip chip-green">completed</span>
+  </div>
+  <div style="margin-top:8px;">
+    <span class="chip chip-red">cancelled</span> <span style="font-size:12px; color:#777;">← bisa dari state draft, published, atau ongoing</span>
+  </div>
+
+  <br>
+  <p><strong>State Diagram: <code>event_guests.application_status</code></strong></p>
+  <div class="flow" style="gap:6px; align-items:center;">
+    <span class="chip chip-orange">pending</span>
+    <span style="color:#0f3460; font-weight:700;">→ pemilik terima →</span>
+    <span class="chip chip-green">accepted</span>
+    <span style="color:#0f3460; font-weight:700;">→ hari-H →</span>
+    <span style="font-size:12px; font-style:italic; color:#555;">cek attendance_status</span>
+  </div>
+  <div style="margin-top:8px;">
+    <span class="chip chip-orange">pending</span>
+    <span style="color:#e94560; font-weight:700;">→ pemilik tolak →</span>
+    <span class="chip chip-red">rejected</span>
+  </div>
+
+  <br>
+  <p><strong>Alur Balas Budi (Trigger Notifikasi)</strong></p>
+  <div class="info-box">
+    <div class="box-title">🔔 Kapan Notifikasi Balas Budi Dibuat?</div>
+    Ketika User B mempublish acara baru (events.status berubah dari 'draft' → 'published'), sistem harus:
+    <br><br>
+    1. Cari semua user yang pernah hadir di acara User B (event_guests WHERE user_id = B AND attendance_status = 'present').
+    <br>
+    2. Buat notifikasi bertipe <code>'balas_budi'</code> untuk masing-masing user tersebut.
+    <br>
+    3. Isi: "Si X baru saja membuat acara [nama acara]. Kamu pernah hadir di acaranya. Waktunya balas budi!"
+    <br><br>
+    Logika ini dijalankan di <strong>application layer</strong> (bukan trigger database) agar lebih mudah dikontrol dan di-test.
+  </div>
+</div>
+
+<!-- ═══════════════════ SECTION 5 ═══════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <div>
+      <div class="section-title">Business Rules & Constraint</div>
+      <div class="section-sub">Aturan Bisnis yang Wajib Diterapkan</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Aturan Bisnis</th><th>Diterapkan Di</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700; color:#e94560;">BR-01</td>
+          <td>Satu user tidak boleh punya acara bertabrakan jadwal</td>
+          <td>Application Layer</td>
+          <td>Cek overlap sebelum INSERT/UPDATE event. Acara berstatus 'cancelled' dikecualikan.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:#e94560;">BR-02</td>
+          <td>User tidak bisa mendaftar ke acara miliknya sendiri</td>
+          <td>Application Layer</td>
+          <td>Cek <code>event.user_id != current_user_id</code> sebelum membuat event_guests.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:#e94560;">BR-03</td>
+          <td>Satu user hanya bisa mengajukan sekali per acara</td>
+          <td>DB Constraint</td>
+          <td>UNIQUE KEY <code>(event_id, user_id)</code> pada tabel event_guests.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:#e94560;">BR-04</td>
+          <td>Form bawaan wajib diisi sebelum pengajuan dikirim</td>
+          <td>Application Layer</td>
+          <td>Minimal harus ada 1 baris di guest_gifts sebelum application_status diset ke 'pending'.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:#e94560;">BR-05</td>
+          <td>Bawaan tidak bisa diubah setelah pengajuan diterima</td>
+          <td>Application Layer</td>
+          <td>Cek application_status == 'pending' sebelum mengizinkan edit guest_gifts.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:#e94560;">BR-06</td>
+          <td>Jumlah tamu tidak boleh melebihi max_guests</td>
+          <td>Application Layer</td>
+          <td>Cek count accepted guests &lt; max_guests sebelum menerima pengajuan baru. Berlaku jika max_guests tidak NULL.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:#e94560;">BR-07</td>
+          <td>Verifikasi kehadiran hanya bisa dilakukan pemilik acara</td>
+          <td>Application Layer</td>
+          <td>Pastikan user yang melakukan request adalah pemilik events yang bersangkutan.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:#e94560;">BR-08</td>
+          <td>quantity pada guest_gifts harus > 0</td>
+          <td>DB Constraint</td>
+          <td>Tambahkan CHECK constraint: <code>CHECK (quantity > 0)</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════ SECTION 6 ═══════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <div>
+      <div class="section-title">Indeks & Optimasi Query</div>
+      <div class="section-sub">Database Indexing Strategy</div>
+    </div>
+  </div>
+
+  <p>Berikut daftar indeks yang direkomendasikan untuk performa optimal pada query-query yang paling sering dijalankan:</p>
+
+  <ul class="index-list">
+    <li>
+      <span class="idx-tag">IDX-01</span>
+      <span><strong>events</strong> → <code>(user_id, status)</code> — untuk query dashboard acara milik user dan filter berdasarkan status</span>
+    </li>
+    <li>
+      <span class="idx-tag">IDX-02</span>
+      <span><strong>events</strong> → <code>(start_datetime, end_datetime)</code> — untuk validasi overlap jadwal dan query acara berdasarkan rentang waktu</span>
+    </li>
+    <li>
+      <span class="idx-tag">IDX-03</span>
+      <span><strong>events</strong> → <code>(event_category_id)</code> — untuk filter acara berdasarkan kategori</span>
+    </li>
+    <li>
+      <span class="idx-tag">IDX-04</span>
+      <span><strong>event_guests</strong> → <code>(event_id, application_status)</code> — untuk query daftar tamu per acara berdasarkan status</span>
+    </li>
+    <li>
+      <span class="idx-tag">IDX-05</span>
+      <span><strong>event_guests</strong> → <code>(user_id, application_status)</code> — untuk riwayat acara yang dihadiri user tertentu</span>
+    </li>
+    <li>
+      <span class="idx-tag">IDX-06</span>
+      <span><strong>guest_gifts</strong> → <code>(event_guest_id)</code> — untuk mengambil bawaan milik satu pengajuan tamu</span>
+    </li>
+    <li>
+      <span class="idx-tag">IDX-07</span>
+      <span><strong>notifications</strong> → <code>(recipient_user_id, is_read)</code> — untuk query notifikasi belum dibaca milik user</span>
+    </li>
+    <li>
+      <span class="idx-tag">IDX-08</span>
+      <span><strong>notifications</strong> → <code>(type, related_event_id)</code> — untuk mencegah duplikasi notifikasi balas budi</span>
+    </li>
+  </ul>
+</div>
+
+<!-- ═══════════════════ SECTION 7 ═══════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <div>
+      <div class="section-title">Contoh Query Utama</div>
+      <div class="section-sub">Sample SQL Queries untuk Fitur-Fitur Utama</div>
+    </div>
+  </div>
+
+  <div class="table-title">Q1 — Dashboard: Daftar Acara Milik User (dengan ringkasan tamu)</div>
+  <pre><span class="sql-comment">-- Dashboard pemilik acara: semua acara beserta jumlah tamu diterima</span>
+<span class="sql-kw">SELECT</span>
+    e.id, e.title, e.status,
+    e.start_datetime, e.end_datetime,
+    e.location_name,
+    ec.name <span class="sql-kw">AS</span> category_name,
+    <span class="sql-fn">COUNT</span>(eg.id) <span class="sql-kw">AS</span> total_applicants,
+    <span class="sql-fn">SUM</span>(<span class="sql-kw">CASE WHEN</span> eg.application_status = <span class="sql-str">'accepted'</span> <span class="sql-kw">THEN</span> <span class="sql-num">1</span> <span class="sql-kw">ELSE</span> <span class="sql-num">0</span> <span class="sql-kw">END</span>) <span class="sql-kw">AS</span> total_accepted,
+    <span class="sql-fn">SUM</span>(<span class="sql-kw">CASE WHEN</span> eg.attendance_status = <span class="sql-str">'present'</span> <span class="sql-kw">THEN</span> <span class="sql-num">1</span> <span class="sql-kw">ELSE</span> <span class="sql-num">0</span> <span class="sql-kw">END</span>) <span class="sql-kw">AS</span> total_hadir
+<span class="sql-kw">FROM</span> events e
+<span class="sql-kw">LEFT JOIN</span> event_categories ec <span class="sql-kw">ON</span> e.event_category_id = ec.id
+<span class="sql-kw">LEFT JOIN</span> event_guests eg <span class="sql-kw">ON</span> e.id = eg.event_id
+<span class="sql-kw">WHERE</span> e.user_id = <span class="sql-num">:user_id</span>
+<span class="sql-kw">GROUP BY</span> e.id
+<span class="sql-kw">ORDER BY</span> e.start_datetime <span class="sql-kw">DESC</span>;</pre>
+
+  <div class="table-title">Q2 — Detail Tamu + Bawaan Lengkap untuk Satu Acara</div>
+  <pre><span class="sql-comment">-- Detail semua tamu acara beserta rincian bawaannya</span>
+<span class="sql-kw">SELECT</span>
+    u.name <span class="sql-kw">AS</span> guest_name,
+    u.phone_number,
+    eg.application_status,
+    eg.attendance_status,
+    eg.gift_verified,
+    gc.name <span class="sql-kw">AS</span> gift_type,
+    gg.quantity,
+    gc.unit,
+    gg.notes <span class="sql-kw">AS</span> gift_notes
+<span class="sql-kw">FROM</span> event_guests eg
+<span class="sql-kw">JOIN</span> users u <span class="sql-kw">ON</span> eg.user_id = u.id
+<span class="sql-kw">JOIN</span> guest_gifts gg <span class="sql-kw">ON</span> eg.id = gg.event_guest_id
+<span class="sql-kw">JOIN</span> gift_categories gc <span class="sql-kw">ON</span> gg.gift_category_id = gc.id
+<span class="sql-kw">WHERE</span> eg.event_id = <span class="sql-num">:event_id</span>
+<span class="sql-kw">ORDER BY</span> u.name, gc.name;</pre>
+
+  <div class="table-title">Q3 — Riwayat: Acara yang Pernah Dihadiri User</div>
+  <pre><span class="sql-comment">-- Riwayat acara yang pernah user datangi beserta bawaannya</span>
+<span class="sql-kw">SELECT</span>
+    e.title <span class="sql-kw">AS</span> event_title,
+    e.start_datetime,
+    ec.name <span class="sql-kw">AS</span> event_category,
+    owner.name <span class="sql-kw">AS</span> event_owner,
+    eg.attendance_status,
+    gc.name <span class="sql-kw">AS</span> gift_type,
+    gg.quantity,
+    gc.unit
+<span class="sql-kw">FROM</span> event_guests eg
+<span class="sql-kw">JOIN</span> events e <span class="sql-kw">ON</span> eg.event_id = e.id
+<span class="sql-kw">JOIN</span> event_categories ec <span class="sql-kw">ON</span> e.event_category_id = ec.id
+<span class="sql-kw">JOIN</span> users owner <span class="sql-kw">ON</span> e.user_id = owner.id
+<span class="sql-kw">JOIN</span> guest_gifts gg <span class="sql-kw">ON</span> eg.id = gg.event_guest_id
+<span class="sql-kw">JOIN</span> gift_categories gc <span class="sql-kw">ON</span> gg.gift_category_id = gc.id
+<span class="sql-kw">WHERE</span> eg.user_id = <span class="sql-num">:user_id</span>
+  <span class="sql-kw">AND</span> eg.application_status = <span class="sql-str">'accepted'</span>
+<span class="sql-kw">ORDER BY</span> e.start_datetime <span class="sql-kw">DESC</span>;</pre>
+
+  <div class="table-title">Q4 — Validasi Anti-Tabrakan Jadwal</div>
+  <pre><span class="sql-comment">-- Cek apakah user sudah punya acara di rentang waktu yang diinginkan</span>
+<span class="sql-comment">-- Jika query ini mengembalikan baris, maka jadwal bertabrakan (TOLAK)</span>
+<span class="sql-kw">SELECT</span> id, title, start_datetime, end_datetime
+<span class="sql-kw">FROM</span> events
+<span class="sql-kw">WHERE</span> user_id = <span class="sql-num">:user_id</span>
+  <span class="sql-kw">AND</span> status <span class="sql-kw">NOT IN</span> (<span class="sql-str">'cancelled'</span>)
+  <span class="sql-kw">AND</span> start_datetime <span class="sql-kw">&lt;</span> <span class="sql-num">:new_end_datetime</span>
+  <span class="sql-kw">AND</span> end_datetime <span class="sql-kw">&gt;</span> <span class="sql-num">:new_start_datetime</span>
+<span class="sql-kw">LIMIT</span> <span class="sql-num">1</span>;</pre>
+
+  <div class="table-title">Q5 — Trigger Balas Budi: Siapa yang Perlu Dinotifikasi?</div>
+  <pre><span class="sql-comment">-- Ketika user X publish acara baru (event_id = :new_event_id),</span>
+<span class="sql-comment">-- cari semua user yang pernah hadir di acara milik user X</span>
+<span class="sql-kw">SELECT DISTINCT</span>
+    eg.user_id <span class="sql-kw">AS</span> recipient_user_id
+<span class="sql-kw">FROM</span> event_guests eg
+<span class="sql-kw">JOIN</span> events e <span class="sql-kw">ON</span> eg.event_id = e.id
+<span class="sql-kw">WHERE</span> e.user_id = <span class="sql-num">:event_owner_id</span>          <span class="sql-comment">-- acara milik si pemilik</span>
+  <span class="sql-kw">AND</span> eg.attendance_status = <span class="sql-str">'present'</span>    <span class="sql-comment">-- yang pernah hadir</span>
+  <span class="sql-kw">AND</span> eg.user_id != <span class="sql-num">:event_owner_id</span>;       <span class="sql-comment">-- bukan dirinya sendiri</span>
+<span class="sql-comment">-- Kemudian buat baris di tabel notifications untuk tiap user di atas</span></pre>
+</div>
+
+<!-- ═══════════════════ SECTION 8 ═══════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <div>
+      <div class="section-title">Catatan & Rekomendasi</div>
+      <div class="section-sub">Notes, Recommendations & Future Considerations</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">🛠️ Teknologi yang Direkomendasikan</div>
+      <ul>
+        <li><strong>PostgreSQL 15+</strong> — lebih robust untuk produksi</li>
+        <li><strong>MySQL 8+</strong> — jika tim lebih familiar</li>
+        <li>Gunakan ORM seperti Prisma, Eloquent, atau TypeORM</li>
+        <li>Migrasi database: gunakan tools seperti Flyway atau migrasi bawaan framework</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">🔐 Keamanan Data</div>
+      <ul>
+        <li>Selalu hash password dengan bcrypt/argon2 (cost factor ≥ 12)</li>
+        <li>Jangan simpan token sesi di database (gunakan JWT atau Redis)</li>
+        <li>Semua input user wajib di-sanitize sebelum query</li>
+        <li>Gunakan parameterized query (hindari raw SQL dengan string concat)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-title">📈 Potensi Pengembangan Fitur</div>
+      <ul>
+        <li>Fitur chat antara pemilik acara dan tamu</li>
+        <li>Rating/review setelah acara selesai</li>
+        <li>Rekap statistik total bawaan per acara</li>
+        <li>Fitur undangan digital (share link acara)</li>
+        <li>Notifikasi push (Firebase/OneSignal)</li>
+        <li>Laporan PDF rekapitulasi tamu & bawaan</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">⚠️ Hal yang Perlu Dikonfirmasi Ulang</div>
+      <ul>
+        <li>Apakah data master gift_categories bisa ditambah oleh user, atau hanya oleh admin?</li>
+        <li>Apakah event yang sudah 'completed' bisa dihapus?</li>
+        <li>Berapa lama data notifikasi disimpan?</li>
+        <li>Apakah diperlukan fitur soft-delete (hapus data tapi tidak permanen)?</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="success-box" style="margin-top:20px;">
+    <div class="box-title">✅ Ringkasan Tabel Final</div>
+    Total <strong>8 tabel</strong> dirancang: <code>users</code>, <code>event_categories</code>, <code>events</code>, <code>event_gift_recommendations</code>, <code>gift_categories</code>, <code>event_guests</code>, <code>guest_gifts</code>, <code>notifications</code>. Semua relasi menggunakan Foreign Key dengan ON DELETE yang perlu dikonfirmasi (disarankan: RESTRICT untuk data finansial, CASCADE untuk data turunan langsung).
+  </div>
+</div>
+
+<div class="doc-footer">
+  Platform Buwoh – Database Design Document v1.0 &nbsp;|&nbsp; Dibuat April 2026<br>
+  Dokumen ini bersifat draft dan dapat direvisi sesuai kebutuhan pengembangan
+</div>
+
+</div>
+</body>
+</html>

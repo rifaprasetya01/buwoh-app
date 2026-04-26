@@ -1,0 +1,213 @@
+// ============================================
+// Prisma Schema — Platform Buwoh
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Tabel 1: users ───
+model User {
+  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name             String    @db.VarChar(100)
+  email            String    @unique @db.VarChar(150)
+  phoneNumber      String?   @unique @map("phone_number") @db.VarChar(20)
+  passwordHash     String    @map("password_hash") @db.VarChar(255)
+  profilePhotoUrl  String?   @map("profile_photo_url") @db.VarChar(500)
+  address          String?   @db.Text
+  emailVerifiedAt  DateTime? @map("email_verified_at")
+  isActive         Boolean   @default(true) @map("is_active") @db.TinyInt
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  events                Event[]
+  eventGuests           EventGuest[]
+  receivedNotifications Notification[] @relation("RecipientNotifications")
+  sentNotifications     Notification[] @relation("SenderNotifications")
+
+  @@map("users")
+}
+
+// ─── Tabel 2: event_categories ───
+model EventCategory {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  name      String   @unique @db.VarChar(100)
+  iconUrl   String?  @map("icon_url") @db.VarChar(500)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  events Event[]
+
+  @@map("event_categories")
+}
+
+// ─── Tabel 3: events ───
+model Event {
+  id              BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  userId          BigInt   @map("user_id") @db.UnsignedBigInt
+  eventCategoryId Int      @map("event_category_id") @db.UnsignedInt
+  title           String   @db.VarChar(200)
+  description     String?  @db.Text
+  locationName    String   @map("location_name") @db.VarChar(300)
+  locationAddress String   @map("location_address") @db.Text
+  locationLat     Decimal? @map("location_lat") @db.Decimal(10, 8)
+  locationLng     Decimal? @map("location_lng") @db.Decimal(11, 8)
+  startDatetime   DateTime @map("start_datetime")
+  endDatetime     DateTime @map("end_datetime")
+  maxGuests       Int?     @map("max_guests") @db.UnsignedInt
+  coverImageUrl   String?  @map("cover_image_url") @db.VarChar(500)
+  status          EventStatus @default(draft)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventCategory          EventCategory           @relation(fields: [eventCategoryId], references: [id])
+  eventGuests            EventGuest[]
+  giftRecommendations    EventGiftRecommendation[]
+  relatedNotifications   Notification[]
+
+  // Indexes (IDX-01, IDX-02, IDX-03)
+  @@index([userId, status], name: "IDX_01_user_status")
+  @@index([startDatetime, endDatetime], name: "IDX_02_datetime_range")
+  @@index([eventCategoryId], name: "IDX_03_category")
+  @@map("events")
+}
+
+enum EventStatus {
+  draft
+  published
+  ongoing
+  completed
+  cancelled
+}
+
+// ─── Tabel 4: event_gift_recommendations ───
+model EventGiftRecommendation {
+  id                BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  eventId           BigInt   @map("event_id") @db.UnsignedBigInt
+  giftCategoryId    Int      @map("gift_category_id") @db.UnsignedInt
+  suggestedQuantity Decimal? @map("suggested_quantity") @db.Decimal(10, 2)
+  notes             String?  @db.VarChar(300)
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  // Relations
+  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  giftCategory GiftCategory @relation(fields: [giftCategoryId], references: [id])
+
+  @@map("event_gift_recommendations")
+}
+
+// ─── Tabel 5: gift_categories ───
+model GiftCategory {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  name       String   @unique @db.VarChar(100)
+  unit       String   @db.VarChar(20)
+  iconUrl    String?  @map("icon_url") @db.VarChar(500)
+  isMonetary Boolean  @default(false) @map("is_monetary") @db.TinyInt
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  guestGifts          GuestGift[]
+  giftRecommendations EventGiftRecommendation[]
+
+  @@map("gift_categories")
+}
+
+// ─── Tabel 6: event_guests ───
+model EventGuest {
+  id                BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  eventId           BigInt              @map("event_id") @db.UnsignedBigInt
+  userId            BigInt              @map("user_id") @db.UnsignedBigInt
+  applicationStatus ApplicationStatus   @default(pending) @map("application_status")
+  attendanceStatus  AttendanceStatus    @default(not_verified) @map("attendance_status")
+  giftVerified      Boolean             @default(false) @map("gift_verified") @db.TinyInt
+  rejectionReason   String?             @map("rejection_reason") @db.VarChar(300)
+  notesFromGuest    String?             @map("notes_from_guest") @db.Text
+  appliedAt         DateTime            @default(now()) @map("applied_at")
+  respondedAt       DateTime?           @map("responded_at")
+  verifiedAt        DateTime?           @map("verified_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  event      Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestGifts GuestGift[]
+
+  // Constraints
+  @@unique([eventId, userId], name: "uq_event_user")
+
+  // Indexes (IDX-04, IDX-05)
+  @@index([eventId, applicationStatus], name: "IDX_04_event_app_status")
+  @@index([userId, applicationStatus], name: "IDX_05_user_app_status")
+  @@map("event_guests")
+}
+
+enum ApplicationStatus {
+  pending
+  accepted
+  rejected
+}
+
+enum AttendanceStatus {
+  not_verified
+  present
+  absent
+}
+
+// ─── Tabel 7: guest_gifts ───
+model GuestGift {
+  id             BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  eventGuestId   BigInt   @map("event_guest_id") @db.UnsignedBigInt
+  giftCategoryId Int      @map("gift_category_id") @db.UnsignedInt
+  quantity       Decimal  @db.Decimal(10, 2)
+  notes          String?  @db.VarChar(300)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  eventGuest   EventGuest   @relation(fields: [eventGuestId], references: [id], onDelete: Cascade)
+  giftCategory GiftCategory @relation(fields: [giftCategoryId], references: [id])
+
+  // Indexes (IDX-06)
+  @@index([eventGuestId], name: "IDX_06_event_guest")
+  @@map("guest_gifts")
+}
+
+// ─── Tabel 8: notifications ───
+model Notification {
+  id              BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  recipientUserId BigInt           @map("recipient_user_id") @db.UnsignedBigInt
+  senderUserId    BigInt?          @map("sender_user_id") @db.UnsignedBigInt
+  relatedEventId  BigInt?          @map("related_event_id") @db.UnsignedBigInt
+  type            NotificationType
+  title           String           @db.VarChar(200)
+  message         String           @db.Text
+  isRead          Boolean          @default(false) @map("is_read") @db.TinyInt
+  createdAt       DateTime         @default(now()) @map("created_at")
+  readAt          DateTime?        @map("read_at")
+
+  // Relations
+  recipient    User   @relation("RecipientNotifications", fields: [recipientUserId], references: [id], onDelete: Cascade)
+  sender       User?  @relation("SenderNotifications", fields: [senderUserId], references: [id], onDelete: SetNull)
+  relatedEvent Event? @relation(fields: [relatedEventId], references: [id], onDelete: SetNull)
+
+  // Indexes (IDX-07, IDX-08)
+  @@index([recipientUserId, isRead], name: "IDX_07_recipient_read")
+  @@index([type, relatedEventId], name: "IDX_08_type_event")
+  @@map("notifications")
+}
+
+enum NotificationType {
+  balas_budi
+  application_accepted
+  application_rejected
+  new_applicant
+  attendance_verified
+}
