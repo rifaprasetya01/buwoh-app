@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'create_event_screen.dart';
+import 'invitation_detail_screen.dart';
+import 'invitations_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -43,7 +45,8 @@ class HomeScreen extends StatelessWidget {
                               color: _primaryContainer,
                               image: const DecorationImage(
                                 image: NetworkImage(
-                                    'https://i.pravatar.cc/150?img=3'),
+                                  'https://i.pravatar.cc/150?img=3',
+                                ),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -64,17 +67,20 @@ class HomeScreen extends StatelessWidget {
                                 ),
                                 Row(
                                   children: [
-                                    const Icon(Icons.location_on,
-                                        size: 12,
-                                        color: _onSurfaceVariant),
+                                    const Icon(
+                                      Icons.location_on,
+                                      size: 12,
+                                      color: _onSurfaceVariant,
+                                    ),
                                     const SizedBox(width: 2),
                                     Text(
                                       'Jakarta Selatan',
                                       style: TextStyle(
                                         fontFamily: 'Plus Jakarta Sans',
                                         fontSize: 11,
-                                        color: _onSurfaceVariant
-                                            .withValues(alpha: 0.8),
+                                        color: _onSurfaceVariant.withValues(
+                                          alpha: 0.8,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -84,15 +90,21 @@ class HomeScreen extends StatelessWidget {
                           ),
                           IconButton(
                             onPressed: () {},
-                            icon: const Icon(Icons.tune_outlined,
-                                color: _onSurface, size: 22),
+                            icon: const Icon(
+                              Icons.tune_outlined,
+                              color: _onSurface,
+                              size: 22,
+                            ),
                           ),
                           IconButton(
                             onPressed: () {},
                             icon: Stack(
                               children: [
-                                const Icon(Icons.notifications_outlined,
-                                    color: _onSurface, size: 22),
+                                const Icon(
+                                  Icons.notifications_outlined,
+                                  color: _onSurface,
+                                  size: 22,
+                                ),
                                 Positioned(
                                   right: 0,
                                   top: 0,
@@ -151,12 +163,16 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const InvitationsScreen(),
+                              ),
+                            ),
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
                               minimumSize: Size.zero,
-                              tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
                             child: const Text(
                               'Lihat Semua',
@@ -179,27 +195,62 @@ class HomeScreen extends StatelessWidget {
                       height: 190,
                       child: ListView(
                         scrollDirection: Axis.horizontal,
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         children: [
                           // Buat Acara card
                           _BuatAcaraCard(),
                           const SizedBox(width: 12),
                           // Undangan card 1 - highlighted
-                          _UndanganCard(
-                            nama: 'Areta & Fajar',
-                            tanggal: 'Sabtu, 09.00',
-                            jenis: 'BUKA BUDI',
-                            isHighlighted: true,
+                          GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const InvitationDetailScreen(
+                                  namaAcara: 'Buka Budi Areta & Fajar',
+                                  namaHost: 'Keluarga Besar Bpk. Rudi',
+                                  tanggal: 'Sabtu, 14 Jun 2025',
+                                  waktu: '09.00 - 14.00 WIB',
+                                  lokasi: 'Kediaman Bpk. Rudi, Jakarta',
+                                  jenis: 'BUKA BUDI',
+                                  isPrioritas: true,
+                                  imageUrl:
+                                      'https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=600',
+                                ),
+                              ),
+                            ),
+                            child: _UndanganCard(
+                              nama: 'Areta & Fajar',
+                              tanggal: 'Sabtu, 09.00',
+                              jenis: 'BUKA BUDI',
+                              isHighlighted: true,
+                            ),
                           ),
                           const SizedBox(width: 12),
                           // Undangan card 2
-                          _UndanganCard(
-                            nama: 'Putra Bpk. Slamet',
-                            tanggal: '15 SEP',
-                            jenis: 'KHITANAN',
-                            subtitle: 'Gedung Serbaguna Hl',
-                            isHighlighted: false,
+                          GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const InvitationDetailScreen(
+                                  namaAcara: 'Khitanan Putra Bpk. Slamet',
+                                  namaHost: 'Bpk. Slamet Widodo',
+                                  tanggal: 'Minggu, 15 Sep 2025',
+                                  waktu: '08.00 - 13.00 WIB',
+                                  lokasi: 'Gedung Serbaguna Hl, Jakarta',
+                                  jenis: 'KHITANAN',
+                                  subtitle: 'Putra dari Bpk. Slamet Widodo',
+                                  imageUrl:
+                                      'https://images.unsplash.com/photo-1511895426328-dc8714191011?w=600',
+                                ),
+                              ),
+                            ),
+                            child: _UndanganCard(
+                              nama: 'Putra Bpk. Slamet',
+                              tanggal: '15 SEP',
+                              jenis: 'KHITANAN',
+                              subtitle: 'Gedung Serbaguna Hl',
+                              isHighlighted: false,
+                            ),
                           ),
                         ],
                       ),
@@ -263,9 +314,7 @@ class _BuatAcaraCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const CreateEventScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const CreateEventScreen()),
         );
       },
       child: Container(
@@ -351,8 +400,7 @@ class _UndanganCard extends StatelessWidget {
         children: [
           // Badge jenis
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color: isHighlighted
                   ? HomeScreen._tertiaryContainer
@@ -379,9 +427,7 @@ class _UndanganCard extends StatelessWidget {
               fontFamily: 'Plus Jakarta Sans',
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: isHighlighted
-                  ? Colors.white
-                  : HomeScreen._onSurface,
+              color: isHighlighted ? Colors.white : HomeScreen._onSurface,
               height: 1.3,
             ),
           ),
@@ -454,7 +500,8 @@ class _AgendaCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20)),
+                  top: Radius.circular(20),
+                ),
                 child: Image.network(
                   'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600',
                   height: 180,
@@ -463,9 +510,11 @@ class _AgendaCard extends StatelessWidget {
                   errorBuilder: (_, __, ___) => Container(
                     height: 180,
                     color: HomeScreen._surfaceContainerLow,
-                    child: const Icon(Icons.image_outlined,
-                        size: 48,
-                        color: HomeScreen._outlineVariant),
+                    child: const Icon(
+                      Icons.image_outlined,
+                      size: 48,
+                      color: HomeScreen._outlineVariant,
+                    ),
                   ),
                 ),
               ),
@@ -475,7 +524,9 @@ class _AgendaCard extends StatelessWidget {
                 left: 12,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 6),
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: HomeScreen._primaryContainer,
                     borderRadius: BorderRadius.circular(10),
@@ -533,7 +584,9 @@ class _AgendaCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: HomeScreen._primaryContainer,
                         borderRadius: BorderRadius.circular(999),
@@ -556,8 +609,11 @@ class _AgendaCard extends StatelessWidget {
                 // Host
                 const Row(
                   children: [
-                    Icon(Icons.person_outline,
-                        size: 14, color: HomeScreen._onSurfaceVariant),
+                    Icon(
+                      Icons.person_outline,
+                      size: 14,
+                      color: HomeScreen._onSurfaceVariant,
+                    ),
                     SizedBox(width: 6),
                     Text(
                       'Bpk. Bambang Hermawan',
@@ -575,8 +631,11 @@ class _AgendaCard extends StatelessWidget {
                 // Lokasi
                 const Row(
                   children: [
-                    Icon(Icons.location_on_outlined,
-                        size: 14, color: HomeScreen._onSurfaceVariant),
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 14,
+                      color: HomeScreen._onSurfaceVariant,
+                    ),
                     SizedBox(width: 6),
                     Expanded(
                       child: Text(
@@ -598,8 +657,11 @@ class _AgendaCard extends StatelessWidget {
                 // Waktu
                 const Row(
                   children: [
-                    Icon(Icons.access_time_outlined,
-                        size: 14, color: HomeScreen._onSurfaceVariant),
+                    Icon(
+                      Icons.access_time_outlined,
+                      size: 14,
+                      color: HomeScreen._onSurfaceVariant,
+                    ),
                     SizedBox(width: 6),
                     Text(
                       '19.00 - 21.00 WIB',
@@ -618,7 +680,25 @@ class _AgendaCard extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const InvitationDetailScreen(
+                          namaAcara: 'Pernikahan Dimas & Ratna',
+                          namaHost: 'Bpk. Bambang Hermawan',
+                          tanggal: 'Sabtu, 12 Okt 2024',
+                          waktu: '19.00 - 21.00 WIB',
+                          lokasi: 'Balai Sudirman, Tebet, Jakarta Selatan',
+                          jenis: 'PERNIKAHAN',
+                          subtitle:
+                              'Hajatan Keluarga Besar Bpk. Bambang Hermawan',
+                          isPrioritas: true,
+                          jarakKm: '1.3km',
+                          imageUrl:
+                              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600',
+                        ),
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: HomeScreen._primary,
                       foregroundColor: Colors.white,
@@ -658,8 +738,16 @@ class _BottomNavBarState extends State<_BottomNavBar> {
 
   final _items = const [
     {'icon': Icons.home_outlined, 'activeIcon': Icons.home, 'label': 'Beranda'},
-    {'icon': Icons.history_outlined, 'activeIcon': Icons.history, 'label': 'Riwayat'},
-    {'icon': Icons.person_outline, 'activeIcon': Icons.person, 'label': 'Profil'},
+    {
+      'icon': Icons.history_outlined,
+      'activeIcon': Icons.history,
+      'label': 'Riwayat',
+    },
+    {
+      'icon': Icons.person_outline,
+      'activeIcon': Icons.person,
+      'label': 'Profil',
+    },
   ];
 
   @override
@@ -668,8 +756,7 @@ class _BottomNavBarState extends State<_BottomNavBar> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: HomeScreen._surfaceContainerLowest,
-        borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF191C1B).withValues(alpha: 0.06),
@@ -687,8 +774,7 @@ class _BottomNavBarState extends State<_BottomNavBar> {
             onTap: () => setState(() => _selected = i),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               decoration: BoxDecoration(
                 color: isSelected
                     ? HomeScreen._primary.withValues(alpha: 0.1)
