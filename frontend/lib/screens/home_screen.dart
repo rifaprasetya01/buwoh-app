@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Buwoh',
+                                  'Budi',
                                   style: TextStyle(
                                     fontFamily: 'Plus Jakarta Sans',
                                     fontSize: 15,
@@ -115,11 +115,11 @@ class HomeScreen extends StatelessWidget {
                     // ── Greeting ─────────────────────────────────────────
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 24, 20, 4),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Text(
-                            'Halo, Budi ',
-                            style: TextStyle(
+                            _getGreeting(),
+                            style: const TextStyle(
                               fontFamily: 'Plus Jakarta Sans',
                               fontSize: 28,
                               fontWeight: FontWeight.w800,
@@ -127,20 +127,9 @@ class HomeScreen extends StatelessWidget {
                               letterSpacing: -0.5,
                             ),
                           ),
-                          Text('👋', style: TextStyle(fontSize: 26)),
+                          const SizedBox(width: 8),
+                          const Text('👋', style: TextStyle(fontSize: 26)),
                         ],
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                      child: Text(
-                        'Ada 4 undangan hajatan yang\nmenunggu kehadiranmu minggu ini.',
-                        style: TextStyle(
-                          fontFamily: 'Plus Jakarta Sans',
-                          fontSize: 13,
-                          color: _onSurfaceVariant,
-                          height: 1.5,
-                        ),
                       ),
                     ),
 
@@ -187,7 +176,7 @@ class HomeScreen extends StatelessWidget {
 
                     // ── Horizontal scroll undangan ───────────────────────
                     SizedBox(
-                      height: 160,
+                      height: 190,
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         padding:
@@ -250,6 +239,17 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 11) {
+      return 'Selamat Pagi';
+    } else if (hour < 15) {
+      return 'Selamat Siang';
+    } else if (hour < 18) {
+      return 'Selamat Sore';
+    } else {
+      return 'Selamat Malam';
+    }
   }
 }
 
@@ -267,8 +267,8 @@ class _BuatAcaraCard extends StatelessWidget {
         );
       },
       child: Container(
-        width: 100,
-        height: 160,
+        width: 140,
+        height: 190,
         decoration: BoxDecoration(
           color: HomeScreen._surfaceContainerLowest,
           borderRadius: BorderRadius.circular(20),
@@ -329,7 +329,7 @@ class _UndanganCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 140,
-      height: 160,
+      height: 190,
       decoration: BoxDecoration(
         color: isHighlighted
             ? HomeScreen._primaryContainer
