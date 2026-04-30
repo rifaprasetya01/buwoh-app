@@ -20,6 +20,7 @@ model User {
   passwordHash     String    @map("password_hash") @db.VarChar(255)
   profilePhotoUrl  String?   @map("profile_photo_url") @db.VarChar(500)
   address          String?   @db.Text
+  birthDate        DateTime? @map("birth_date") @db.Date
   emailVerifiedAt  DateTime? @map("email_verified_at")
   isActive         Boolean   @default(true) @map("is_active") @db.TinyInt
   createdAt        DateTime  @default(now()) @map("created_at")

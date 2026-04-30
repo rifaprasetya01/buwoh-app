@@ -19,6 +19,7 @@ const registerSchema = Joi.object({
     }),
   phoneNumber: Joi.string().trim().max(20).allow(null, '').optional(),
   address: Joi.string().trim().allow(null, '').optional(),
+  birthDate: Joi.date().iso().allow(null).optional(),
 });
 
 const loginSchema = Joi.object({
@@ -37,6 +38,7 @@ const updateProfileSchema = Joi.object({
   name: Joi.string().trim().min(2).max(100).optional(),
   phoneNumber: Joi.string().trim().max(20).allow(null, '').optional(),
   address: Joi.string().trim().allow(null, '').optional(),
+  birthDate: Joi.date().iso().allow(null).optional(),
   profilePhotoUrl: Joi.string().trim().uri().max(500).allow(null, '').optional(),
 });
 

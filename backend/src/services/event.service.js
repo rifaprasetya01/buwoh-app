@@ -65,25 +65,47 @@ const createEvent = async (userId, data) => {
     throw ApiError.notFound('Kategori acara tidak ditemukan.');
   }
 
-  const event = await prisma.event.create({
-    data: {
-      userId: BigInt(userId),
-      eventCategoryId: data.eventCategoryId,
-      title: data.title,
-      description: data.description || null,
-      locationName: data.locationName,
-      locationAddress: data.locationAddress,
-      locationLat: data.locationLat || null,
-      locationLng: data.locationLng || null,
-      startDatetime: new Date(data.startDatetime),
-      endDatetime: new Date(data.endDatetime),
-      maxGuests: data.maxGuests || null,
-      coverImageUrl: data.coverImageUrl || null,
-      status: 'draft',
-    },
-    include: {
-      eventCategory: true,
-    },
+  // Create event + gift recommendations dalam satu transaksi
+  const event = await prisma.$transaction(async (tx) => {
+    const newEvent = await tx.event.create({
+      data: {
+        userId: BigInt(userId),
+        eventCategoryId: data.eventCategoryId,
+        title: data.title,
+        description: data.description || null,
+        locationName: data.locationName,
+        locationAddress: data.locationAddress,
+        locationLat: data.locationLat || null,
+        locationLng: data.locationLng || null,
+        startDatetime: new Date(data.startDatetime),
+        endDatetime: new Date(data.endDatetime),
+        maxGuests: data.maxGuests || null,
+        coverImageUrl: data.coverImageUrl || null,
+        status: 'draft',
+      },
+    });
+
+    // Create gift recommendations jika ada
+    if (data.giftRecommendations && data.giftRecommendations.length > 0) {
+      const recData = data.giftRecommendations.map((rec) => ({
+        eventId: newEvent.id,
+        giftCategoryId: rec.giftCategoryId,
+        suggestedQuantity: rec.suggestedQuantity || null,
+        notes: rec.notes || null,
+      }));
+      await tx.eventGiftRecommendation.createMany({ data: recData });
+    }
+
+    // Return with relations
+    return tx.event.findUnique({
+      where: { id: newEvent.id },
+      include: {
+        eventCategory: true,
+        giftRecommendations: {
+          include: { giftCategory: true },
+        },
+      },
+    });
   });
 
   return serializeEvent(event);

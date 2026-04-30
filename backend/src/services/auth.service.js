@@ -15,7 +15,7 @@ const serializeUser = (user) => ({
 /**
  * Register user baru
  */
-const register = async ({ name, email, password, phoneNumber, address }) => {
+const register = async ({ name, email, password, phoneNumber, address, birthDate }) => {
   // Cek email sudah terpakai
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
@@ -43,6 +43,7 @@ const register = async ({ name, email, password, phoneNumber, address }) => {
       phoneNumber: phoneNumber || null,
       passwordHash,
       address: address || null,
+      birthDate: birthDate ? new Date(birthDate) : null,
     },
     select: {
       id: true,
@@ -51,6 +52,7 @@ const register = async ({ name, email, password, phoneNumber, address }) => {
       phoneNumber: true,
       profilePhotoUrl: true,
       address: true,
+      birthDate: true,
       createdAt: true,
     },
   });
@@ -94,6 +96,7 @@ const login = async ({ email, password }) => {
     phoneNumber: user.phoneNumber,
     profilePhotoUrl: user.profilePhotoUrl,
     address: user.address,
+    birthDate: user.birthDate,
   };
 
   return { user: serializeUser(userData), token };
@@ -112,6 +115,7 @@ const getMe = async (userId) => {
       phoneNumber: true,
       profilePhotoUrl: true,
       address: true,
+      birthDate: true,
       emailVerifiedAt: true,
       isActive: true,
       createdAt: true,

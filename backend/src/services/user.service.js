@@ -22,6 +22,7 @@ const getUserById = async (userId) => {
       phoneNumber: true,
       profilePhotoUrl: true,
       address: true,
+      birthDate: true,
       createdAt: true,
     },
   });
@@ -56,6 +57,7 @@ const updateProfile = async (userId, data) => {
       ...(data.name && { name: data.name }),
       ...(data.phoneNumber !== undefined && { phoneNumber: data.phoneNumber || null }),
       ...(data.address !== undefined && { address: data.address || null }),
+      ...(data.birthDate !== undefined && { birthDate: data.birthDate ? new Date(data.birthDate) : null }),
       ...(data.profilePhotoUrl !== undefined && { profilePhotoUrl: data.profilePhotoUrl || null }),
     },
     select: {
@@ -65,6 +67,7 @@ const updateProfile = async (userId, data) => {
       phoneNumber: true,
       profilePhotoUrl: true,
       address: true,
+      birthDate: true,
       updatedAt: true,
     },
   });

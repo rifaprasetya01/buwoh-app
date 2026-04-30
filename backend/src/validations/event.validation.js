@@ -21,6 +21,14 @@ const createEventSchema = Joi.object({
     }),
   maxGuests: Joi.number().integer().positive().allow(null).optional(),
   coverImageUrl: Joi.string().trim().uri().max(500).allow(null, '').optional(),
+  giftRecommendations: Joi.array().items(
+    Joi.object({
+      giftCategoryId: Joi.number().integer().positive().required()
+        .messages({ 'any.required': 'Kategori bawaan wajib dipilih' }),
+      suggestedQuantity: Joi.number().positive().allow(null).optional(),
+      notes: Joi.string().trim().max(300).allow(null, '').optional(),
+    })
+  ).optional(),
 });
 
 const updateEventSchema = Joi.object({
