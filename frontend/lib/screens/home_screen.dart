@@ -8,6 +8,7 @@ import 'invitation_detail_screen.dart';
 import 'history_screen.dart';
 
 import 'profile_screen.dart';
+import 'notifications_screen.dart';
 
 // ── Color Tokens (Global Scope) ───────────────────────────────────────────
 const _primary = Color(0xFF134231);
@@ -252,7 +253,14 @@ class _HomeContentState extends State<_HomeContent> {
                             Icons.notifications_outlined,
                             color: _onSurfaceVariant,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NotificationsScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
