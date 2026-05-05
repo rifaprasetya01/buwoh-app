@@ -1,25 +1,6 @@
 import 'package:flutter/material.dart';
-
-// ── Color Tokens (Global Scope) ───────────────────────────────────────────
-const _primary = Color(0xFF134231);
-const _primaryContainer = Color(0xFF2D5A47);
-const _onSurface = Color(0xFF191C1B);
-const _onSurfaceVariant = Color(0xFF414944);
-const _surfaceContainerLow = Color(0xFFF2F4F2);
-const _surfaceContainerHigh = Color(0xFFE6E9E7);
-const _secondaryContainer = Color(0xFFC2E8D6);
-const _onSecondaryContainer = Color(0xFF476A5B);
-const _background = Color(0xFFF8FAF8);
-const _outlineVariant = Color(0xFFC0C8C2);
-const _primaryFixed = Color(0xFFBCEDD4);
-const _onPrimaryFixed = Color(0xFF002115);
-const _tertiary = Color(0xFF705D00);
-const _tertiaryContainer = Color(0xFFC9A900);
-const _onTertiaryContainer = Color(0xFF4C3F00);
-const _surfaceContainerLowest = Color(0xFFFFFFFF);
-const _surfaceContainer = Color(0xFFECEEEC);
-const _tertiaryFixed = Color(0xFFFFE16D);
-const _onTertiaryFixed = Color(0xFF221B00);
+import '../theme/theme.dart';
+import '../widgets/widgets.dart';
 
 class ManageGuestsScreen extends StatefulWidget {
   const ManageGuestsScreen({super.key});
@@ -81,7 +62,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${guest.nama} diterima'),
-        backgroundColor: _primaryContainer,
+        backgroundColor: AppColors.primaryContainer,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -92,13 +73,13 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: _background.withValues(alpha: 0.82),
+        backgroundColor: AppColors.background.withValues(alpha: 0.82),
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: _primary),
+          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -107,12 +88,12 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
             fontFamily: 'Plus Jakarta Sans',
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: _primary,
+            color: AppColors.primary,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings_outlined, color: _primary),
+            icon: const Icon(Icons.settings_outlined, color: AppColors.primary),
             onPressed: () {},
           ),
         ],
@@ -124,7 +105,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: _primaryContainer,
+              color: AppColors.primaryContainer,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Stack(
@@ -159,7 +140,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                         child: Image.network(
                           'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=200',
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(
+                          errorBuilder: (_, _, _) => const Icon(
                             Icons.image_outlined,
                             color: Colors.white54,
                             size: 20,
@@ -283,11 +264,11 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                         height: 40,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: _tertiaryContainer.withValues(alpha: 0.2),
+                          color: AppColors.tertiaryContainer.withValues(alpha: 0.2),
                         ),
                         child: const Icon(
                           Icons.pending_actions_outlined,
-                          color: _onTertiaryContainer,
+                          color: AppColors.onTertiaryContainer,
                           size: 20,
                         ),
                       ),
@@ -303,7 +284,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                               fontFamily: 'Plus Jakarta Sans',
                               fontSize: 14, // Slightly smaller
                               fontWeight: FontWeight.w700,
-                              color: _onSurface,
+                              color: AppColors.onSurface,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -313,7 +294,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                             style: TextStyle(
                               fontFamily: 'Plus Jakarta Sans',
                               fontSize: 10, // Slightly smaller
-                              color: _onSurfaceVariant.withValues(alpha: 0.6),
+                              color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -331,7 +312,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: _tertiaryContainer.withValues(alpha: 0.15),
+                  color: AppColors.tertiaryContainer.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
@@ -340,7 +321,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                     fontFamily: 'Plus Jakarta Sans',
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
-                    color: _onTertiaryContainer,
+                    color: AppColors.onTertiaryContainer,
                   ),
                 ),
               ),
@@ -352,8 +333,12 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
           ..._pending.asMap().entries.map(
             (e) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _PendingCard(
-                guest: e.value,
+              child: BuwohPendingGuestCard(
+                inisial: e.value.inisial,
+                nama: e.value.nama,
+                relasi: e.value.relasi,
+                kontribusiIcon: e.value.kontribusiIcon,
+                kontribusi: e.value.kontribusi,
                 onTerima: () => _terima(e.key),
               ),
             ),
@@ -363,7 +348,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: _surfaceContainerLow,
+                color: AppColors.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Center(
@@ -372,7 +357,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                   style: TextStyle(
                     fontFamily: 'Plus Jakarta Sans',
                     fontSize: 13,
-                    color: _onSurfaceVariant,
+                    color: AppColors.onSurfaceVariant,
                   ),
                 ),
               ),
@@ -388,11 +373,11 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                 height: 40,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _secondaryContainer,
+                  color: AppColors.secondaryContainer,
                 ),
                 child: const Icon(
                   Icons.verified_outlined,
-                  color: _onSecondaryContainer,
+                  color: AppColors.onSecondaryContainer,
                   size: 20,
                 ),
               ),
@@ -406,7 +391,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                       fontFamily: 'Plus Jakarta Sans',
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: _onSurface,
+                      color: AppColors.onSurface,
                     ),
                   ),
                   Text(
@@ -414,7 +399,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                     style: TextStyle(
                       fontFamily: 'Plus Jakarta Sans',
                       fontSize: 11,
-                      color: _onSurfaceVariant.withValues(alpha: 0.6),
+                      color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -427,7 +412,12 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
           ..._validated.map(
             (g) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: _ValidatedCard(guest: g),
+              child: BuwohValidatedGuestCard(
+                nama: g.nama,
+                waktu: g.waktu,
+                kontribusiIcon: g.kontribusiIcon,
+                kontribusi: g.kontribusi,
+              ),
             ),
           ),
 
@@ -458,7 +448,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                   ),
                   child: const Icon(
                     Icons.group_add_outlined,
-                    color: _primary,
+                    color: AppColors.primary,
                     size: 22,
                   ),
                 ),
@@ -469,7 +459,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                     fontFamily: 'Plus Jakarta Sans',
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: _onSurface,
+                    color: AppColors.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -479,7 +469,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                   style: TextStyle(
                     fontFamily: 'Plus Jakarta Sans',
                     fontSize: 11,
-                    color: _onSurfaceVariant,
+                    color: AppColors.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -501,7 +491,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                         fontFamily: 'Plus Jakarta Sans',
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: _onSurface,
+                        color: AppColors.onSurface,
                         letterSpacing: 1.0,
                       ),
                     ),
@@ -516,255 +506,6 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
   }
 }
 
-// ── Pending Card ──────────────────────────────────────────────────────────────
-class _PendingCard extends StatelessWidget {
-  final _Guest guest;
-  final VoidCallback onTerima;
-
-  const _PendingCard({required this.guest, required this.onTerima});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF191C1B).withValues(alpha: 0.04),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              // Avatar inisial
-              Container(
-                width: 44,
-                height: 44,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: _surfaceContainerHigh,
-                ),
-                child: Center(
-                  child: Text(
-                    guest.inisial,
-                    style: const TextStyle(
-                      fontFamily: 'Plus Jakarta Sans',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: _primary,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          guest.nama,
-                          style: const TextStyle(
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: _onSurface,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 7,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _primaryFixed,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            guest.relasi,
-                            style: const TextStyle(
-                              fontFamily: 'Plus Jakarta Sans',
-                              fontSize: 8,
-                              fontWeight: FontWeight.w700,
-                              color: _onPrimaryFixed,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          guest.kontribusiIcon,
-                          size: 14,
-                          color: _onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          guest.kontribusi,
-                          style: const TextStyle(
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontSize: 12,
-                            color: _onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    side: const BorderSide(color: _surfaceContainerHigh),
-                    backgroundColor: _surfaceContainerHigh,
-                  ),
-                  child: const Text(
-                    'Edit',
-                    style: TextStyle(
-                      fontFamily: 'Plus Jakarta Sans',
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: _primary,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                flex: 2,
-                child: ElevatedButton.icon(
-                  onPressed: onTerima,
-                  icon: const Icon(Icons.check_circle, size: 16),
-                  label: const Text(
-                    'Terima (ACC)',
-                    style: TextStyle(
-                      fontFamily: 'Plus Jakarta Sans',
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _primaryContainer,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    elevation: 2,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Validated Card ────────────────────────────────────────────────────────────
-class _ValidatedCard extends StatelessWidget {
-  final _GuestAcc guest;
-
-  const _ValidatedCard({required this.guest});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _outlineVariant.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color(0xFF134231).withValues(alpha: 0.05),
-            ),
-            child: const Icon(Icons.person_outline, color: _primary, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  guest.nama,
-                  style: const TextStyle(
-                    fontFamily: 'Plus Jakarta Sans',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: _onSurface,
-                  ),
-                ),
-                Text(
-                  'Divalidasi ${guest.waktu}',
-                  style: TextStyle(
-                    fontFamily: 'Plus Jakarta Sans',
-                    fontSize: 10,
-                    color: _onSurfaceVariant.withValues(alpha: 0.7),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    guest.kontribusiIcon,
-                    size: 13,
-                    color: const Color(0xFF134231),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    guest.kontribusi,
-                    style: const TextStyle(
-                      fontFamily: 'Plus Jakarta Sans',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF134231),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // ── Data Models ───────────────────────────────────────────────────────────────
 class _Guest {

@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'edit_profile_screen.dart';
 import 'dashboard_screen.dart';
+import '../theme/theme.dart';
+import '../widgets/widgets.dart';
 
 class ProfileScreen extends StatelessWidget {
   final String nama;
@@ -17,27 +19,14 @@ class ProfileScreen extends StatelessWidget {
     this.fotoPath,
     this.onProfileUpdated,
   });
-
-  static const _primary = Color(0xFF134231);
-  static const _primaryContainer = Color(0xFF2D5A47);
-  static const _onSurface = Color(0xFF191C1B);
-  static const _onSurfaceVariant = Color(0xFF414944);
-  static const _outlineVariant = Color(0xFFC0C8C2);
-  static const _surfaceContainerLow = Color(0xFFF2F4F2);
-  static const _surfaceContainerLowest = Color(0xFFFFFFFF);
-  static const _secondaryContainer = Color(0xFFC2E8D6);
-  static const _onSecondaryContainer = Color(0xFF476A5B);
-  static const _tertiary = Color(0xFF705D00);
-  static const _errorContainer = Color(0xFFFFDAD6);
-  static const _error = Color(0xFFBA1A1A);
-  static const _background = Color(0xFFF8FAF8);
+  // ── Color Tokens ──────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: _background.withValues(alpha: 0.82),
+        backgroundColor: AppColors.background.withValues(alpha: 0.82),
         elevation: 0,
         scrolledUnderElevation: 0,
         automaticallyImplyLeading: false,
@@ -46,7 +35,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             const CircleAvatar(
               radius: 16,
-              backgroundColor: _secondaryContainer,
+              backgroundColor: AppColors.secondaryContainer,
               backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=3'),
             ),
             const SizedBox(width: 10),
@@ -56,7 +45,7 @@ class ProfileScreen extends StatelessWidget {
                 fontFamily: 'Plus Jakarta Sans',
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: _primary,
+                color: AppColors.primary,
                 letterSpacing: -0.4,
               ),
             ),
@@ -64,7 +53,7 @@ class ProfileScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: _primary),
+            icon: const Icon(Icons.notifications_outlined, color: AppColors.primary),
             onPressed: () {},
           ),
         ],
@@ -118,12 +107,12 @@ class ProfileScreen extends StatelessWidget {
                               : Image.network(
                                   'https://i.pravatar.cc/150?img=56',
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(
-                                    color: _surfaceContainerLow,
+                                  errorBuilder: (_, _, _) => Container(
+                                    color: AppColors.surfaceContainerLow,
                                     child: const Icon(
                                       Icons.person,
                                       size: 56,
-                                      color: _outlineVariant,
+                                      color: AppColors.outlineVariant,
                                     ),
                                   ),
                                 ),
@@ -141,7 +130,7 @@ class ProfileScreen extends StatelessWidget {
                       fontFamily: 'Plus Jakarta Sans',
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
-                      color: _primary,
+                      color: AppColors.primary,
                       letterSpacing: -0.5,
                     ),
                   ),
@@ -155,7 +144,7 @@ class ProfileScreen extends StatelessWidget {
                       Icon(
                         Icons.location_on_outlined,
                         size: 16,
-                        color: _onSurfaceVariant.withValues(alpha: 0.8),
+                        color: AppColors.onSurfaceVariant.withValues(alpha: 0.8),
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -163,7 +152,7 @@ class ProfileScreen extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Plus Jakarta Sans',
                           fontSize: 13,
-                          color: _onSurfaceVariant.withValues(alpha: 0.8),
+                          color: AppColors.onSurfaceVariant.withValues(alpha: 0.8),
                         ),
                       ),
                     ],
@@ -182,10 +171,10 @@ class ProfileScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: _surfaceContainerLowest,
+                      color: AppColors.surfaceContainerLowest,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: _outlineVariant.withValues(alpha: 0.15),
+                        color: AppColors.outlineVariant.withValues(alpha: 0.15),
                       ),
                       boxShadow: [
                         BoxShadow(
@@ -200,7 +189,7 @@ class ProfileScreen extends StatelessWidget {
                       children: [
                         const Icon(
                           Icons.card_giftcard,
-                          color: _tertiary,
+                          color: AppColors.tertiary,
                           size: 26,
                         ),
                         const SizedBox(height: 10),
@@ -210,7 +199,7 @@ class ProfileScreen extends StatelessWidget {
                             fontFamily: 'Plus Jakarta Sans',
                             fontSize: 26,
                             fontWeight: FontWeight.w800,
-                            color: _primary,
+                            color: AppColors.primary,
                           ),
                         ),
                         const Text(
@@ -219,7 +208,7 @@ class ProfileScreen extends StatelessWidget {
                             fontFamily: 'Plus Jakarta Sans',
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: _onSurfaceVariant,
+                            color: AppColors.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -232,7 +221,7 @@ class ProfileScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: _secondaryContainer,
+                      color: AppColors.secondaryContainer,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
@@ -245,7 +234,7 @@ class ProfileScreen extends StatelessWidget {
                     child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.event_available, color: _primary, size: 26),
+                        Icon(Icons.event_available, color: AppColors.primary, size: 26),
                         SizedBox(height: 10),
                         Text(
                           '3',
@@ -253,7 +242,7 @@ class ProfileScreen extends StatelessWidget {
                             fontFamily: 'Plus Jakarta Sans',
                             fontSize: 26,
                             fontWeight: FontWeight.w800,
-                            color: _primary,
+                            color: AppColors.primary,
                           ),
                         ),
                         Text(
@@ -262,7 +251,7 @@ class ProfileScreen extends StatelessWidget {
                             fontFamily: 'Plus Jakarta Sans',
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: _onSecondaryContainer,
+                            color: AppColors.onSecondaryContainer,
                           ),
                         ),
                       ],
@@ -283,14 +272,14 @@ class ProfileScreen extends StatelessWidget {
                   fontFamily: 'Plus Jakarta Sans',
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: _onSurfaceVariant.withValues(alpha: 0.6),
+                  color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
                   letterSpacing: 2.0,
                 ),
               ),
             ),
 
             // Dashboard (highlighted)
-            _ActionButton(
+            BuwohActionItem(
               icon: Icons.dashboard_outlined,
               label: 'Dashboard',
               isHighlighted: true,
@@ -309,7 +298,7 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 10),
 
             // Edit Profil
-            _ActionButton(
+            BuwohActionItem(
               icon: Icons.person_outline,
               label: 'Edit Profil',
               isHighlighted: false,
@@ -343,7 +332,7 @@ class ProfileScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: _errorContainer.withValues(alpha: 0.3),
+                  color: AppColors.errorContainer.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
@@ -361,7 +350,7 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.logout, color: _error, size: 20),
+                      child: const Icon(Icons.logout, color: AppColors.error, size: 20),
                     ),
                     const SizedBox(width: 16),
                     const Text(
@@ -370,7 +359,7 @@ class ProfileScreen extends StatelessWidget {
                         fontFamily: 'Plus Jakarta Sans',
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: _error,
+                        color: AppColors.error,
                       ),
                     ),
                   ],
@@ -387,103 +376,11 @@ class ProfileScreen extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Plus Jakarta Sans',
                   fontSize: 11,
-                  color: _onSurfaceVariant.withValues(alpha: 0.4),
+                  color: AppColors.onSurfaceVariant.withValues(alpha: 0.4),
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Action Button ─────────────────────────────────────────────────────────────
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isHighlighted;
-  final bool showArrow;
-  final VoidCallback onTap;
-
-  static const _primary = Color(0xFF134231);
-  static const _primaryContainer = Color(0xFF2D5A47);
-  static const _onSurface = Color(0xFF191C1B);
-  static const _onSurfaceVariant = Color(0xFF414944);
-  static const _surfaceContainerLow = Color(0xFFF2F4F2);
-
-  const _ActionButton({
-    required this.icon,
-    required this.label,
-    required this.isHighlighted,
-    required this.showArrow,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: isHighlighted ? _primaryContainer : _surfaceContainerLow,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: isHighlighted
-              ? [
-                  BoxShadow(
-                    color: _primaryContainer.withValues(alpha: 0.25),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isHighlighted
-                    ? Colors.white.withValues(alpha: 0.2)
-                    : Colors.white,
-                boxShadow: isHighlighted
-                    ? null
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.06),
-                          blurRadius: 4,
-                        ),
-                      ],
-              ),
-              child: Icon(
-                icon,
-                color: isHighlighted ? Colors.white : _primary,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontSize: 15,
-                  fontWeight: isHighlighted ? FontWeight.w700 : FontWeight.w600,
-                  color: isHighlighted ? Colors.white : _onSurface,
-                ),
-              ),
-            ),
-            if (showArrow)
-              Icon(
-                Icons.chevron_right,
-                color: isHighlighted ? Colors.white : _onSurfaceVariant,
-                size: 22,
-              ),
           ],
         ),
       ),
