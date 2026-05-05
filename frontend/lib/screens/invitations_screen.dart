@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../models/event_model.dart';
+import '../providers/event_provider.dart';
 import 'invitation_detail_screen.dart';
 
 class InvitationsScreen extends StatefulWidget {
@@ -23,68 +26,9 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
 
   final _filters = ['Semua', 'Pernikahan', 'Khitanan', 'Tasyakuran'];
 
-  final _allInvitations = const [
-    _Invitation(
-      jenis: 'Undangan Pernikahan',
-      jenisColor: Color(0xFF705D00),
-      nama: 'Pernikahan Anisa & Bayu',
-      host: 'Bpk. Haji Sulaiman',
-      tanggal: 'Minggu, 24 Okt 2024',
-      waktu: '09.00 - 21.00 WIB',
-      lokasi: 'Griya Ageng, Solo',
-      lokasiDisplay: 'Griya Ageng, Solo • 2.4 km',
-      imageUrl:
-          'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=300',
-      isBalasBudi: true,
-      tag: 'Pernikahan',
-    ),
-    _Invitation(
-      jenis: 'Khitanan',
-      jenisColor: Color(0xFF134231),
-      nama: 'Syukuran Khitan Ahmad',
-      host: 'Keluarga Bpk. Bambang',
-      tanggal: 'Sabtu, 30 Okt 2024',
-      waktu: '08.00 - 13.00 WIB',
-      lokasi: 'Balai Desa Sukamaju',
-      lokasiDisplay: 'Balai Desa Sukamaju • 0.8 km',
-      imageUrl:
-          'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=300',
-      isBalasBudi: false,
-      tag: 'Khitanan',
-    ),
-    _Invitation(
-      jenis: 'Tasyakuran',
-      jenisColor: Color(0xFF134231),
-      nama: 'Tasyakuran Rumah Baru',
-      host: 'Ibu Retno & Keluarga',
-      tanggal: 'Jumat, 05 Nov 2024',
-      waktu: '10.00 - 14.00 WIB',
-      lokasi: 'Perum Elit Blok C-12',
-      lokasiDisplay: 'Perum Elit Blok C-12 • 5.1 km',
-      imageUrl:
-          'https://images.unsplash.com/photo-1555244162-803834f70033?w=300',
-      isBalasBudi: false,
-      tag: 'Tasyakuran',
-    ),
-    _Invitation(
-      jenis: 'Undangan Pernikahan',
-      jenisColor: Color(0xFF134231),
-      nama: 'Wedding of Rina & Andre',
-      host: 'Keluarga Bpk. Wijaya',
-      tanggal: 'Minggu, 07 Nov 2024',
-      waktu: '17.00 - 22.00 WIB',
-      lokasi: 'Grand Ballroom Hilton, Jakarta',
-      lokasiDisplay: 'Grand Ballroom Hilton • 12.0 km',
-      imageUrl:
-          'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=300',
-      isBalasBudi: false,
-      tag: 'Pernikahan',
-    ),
-  ];
-
-  List<_Invitation> get _filtered {
+  List<EventModel> _getFiltered(List<EventModel> allEvents) {
     final query = _searchCtrl.text.toLowerCase();
-    var list = _allInvitations;
+    var list = allEvents;
     if (_selectedFilter != 0) {
       list = list.where((i) => i.tag == _filters[_selectedFilter]).toList();
     }
@@ -219,8 +163,21 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
 
           // ── List ────────────────────────────────────────────────────────
           Expanded(
-            child: _filtered.isEmpty
-                ? Center(
+            child: Consumer<EventProvider>(
+              builder: (context, eventProvider, _) {
+                if (eventProvider.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (eventProvider.error != null) {
+                  return Center(child: Text('Gagal memuat: ${eventProvider.error}'));
+                }
+
+                final allEvents = eventProvider.events;
+                final filteredEvents = _getFiltered(allEvents);
+
+                if (filteredEvents.isEmpty) {
+                  return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -238,33 +195,37 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
                         ),
                       ],
                     ),
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-                    itemCount: _filtered.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 14),
-                    itemBuilder: (_, i) {
-                      final inv = _filtered[i];
-                      return _InvitationCard(
-                        invitation: inv,
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => InvitationDetailScreen(
-                              namaAcara: inv.nama,
-                              namaHost: inv.host,
-                              tanggal: inv.tanggal,
-                              waktu: inv.waktu,
-                              lokasi: inv.lokasi,
-                              jenis: inv.jenis.toUpperCase(),
-                              imageUrl: inv.imageUrl,
-                              isPrioritas: inv.isBalasBudi,
-                            ),
+                  );
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+                  itemCount: filteredEvents.length,
+                  separatorBuilder: (context, index) => const SizedBox(height: 14),
+                  itemBuilder: (_, i) {
+                    final inv = filteredEvents[i];
+                    return _InvitationCard(
+                      invitation: inv,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => InvitationDetailScreen(
+                            namaAcara: inv.nama,
+                            namaHost: inv.host,
+                            tanggal: inv.tanggal,
+                            waktu: inv.waktu,
+                            lokasi: inv.lokasi,
+                            jenis: inv.jenis.toUpperCase(),
+                            imageUrl: inv.imageUrl,
+                            isPrioritas: inv.isBalasBudi,
                           ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -272,38 +233,11 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
   }
 }
 
-// ── Data Model ───────────────────────────────────────────────────────────────
-class _Invitation {
-  final String jenis;
-  final Color jenisColor;
-  final String nama;
-  final String host;
-  final String tanggal;
-  final String waktu;
-  final String lokasi;
-  final String lokasiDisplay;
-  final String imageUrl;
-  final bool isBalasBudi;
-  final String tag;
 
-  const _Invitation({
-    required this.jenis,
-    required this.jenisColor,
-    required this.nama,
-    required this.host,
-    required this.tanggal,
-    required this.waktu,
-    required this.lokasi,
-    required this.lokasiDisplay,
-    required this.imageUrl,
-    required this.isBalasBudi,
-    required this.tag,
-  });
-}
 
 // ── Invitation Card ──────────────────────────────────────────────────────────
 class _InvitationCard extends StatelessWidget {
-  final _Invitation invitation;
+  final EventModel invitation;
   final VoidCallback onTap;
 
   static const _onSurface = Color(0xFF191C1B);

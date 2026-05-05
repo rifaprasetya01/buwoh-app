@@ -9,6 +9,11 @@ const routes = require('./routes');
 const errorHandler = require('./middlewares/errorHandler');
 const ApiError = require('./utils/ApiError');
 
+// Global BigInt serializer for JSON.stringify
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 const app = express();
 
 // ─── 1. Security Headers ───

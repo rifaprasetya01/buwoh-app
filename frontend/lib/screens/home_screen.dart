@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/event_provider.dart';
+import '../models/event_model.dart';
 import 'create_event_screen.dart';
 import 'invitation_detail_screen.dart';
 import 'invitations_screen.dart';
 import 'login_screen.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,8 +29,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // TODO: Integrate dynamic event data from EventService into the UI
-  // Currently the home screen uses hardcoded mock data for display.
+  int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EventProvider>().fetchEvents();
+      context.read<EventProvider>().fetchUpcomingEvents();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: [
+                  SingleChildScrollView(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,16 +101,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                       color: HomeScreen.onSurfaceVariant,
                                     ),
                                     const SizedBox(width: 2),
-                                    Text(
-                                      context.watch<AuthProvider>().userAddress.isNotEmpty
-                                          ? context.watch<AuthProvider>().userAddress
-                                          : 'Belum diatur',
-                                      style: TextStyle(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        fontSize: 11,
-                                        color: HomeScreen.onSurfaceVariant.withValues(
-                                          alpha: 0.8,
+                                    Expanded(
+                                      child: Text(
+                                        context.watch<AuthProvider>().userAddress.isNotEmpty
+                                            ? context.watch<AuthProvider>().userAddress
+                                            : 'Belum diatur',
+                                        style: TextStyle(
+                                          fontFamily: 'Plus Jakarta Sans',
+                                          fontSize: 11,
+                                          color: HomeScreen.onSurfaceVariant.withValues(
+                                            alpha: 0.8,
+                                          ),
                                         ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
@@ -237,66 +255,62 @@ class _HomeScreenState extends State<HomeScreen> {
                     // ── Horizontal scroll undangan ───────────────────────
                     SizedBox(
                       height: 190,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        children: [
-                          // Buat Acara card
-                          _BuatAcaraCard(),
-                          const SizedBox(width: 12),
-                          // Undangan card 1 - highlighted
-                          GestureDetector(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const InvitationDetailScreen(
-                                  namaAcara: 'Buka Budi Areta & Fajar',
-                                  namaHost: 'Keluarga Besar Bpk. Rudi',
-                                  tanggal: 'Sabtu, 14 Jun 2025',
-                                  waktu: '09.00 - 14.00 WIB',
-                                  lokasi: 'Kediaman Bpk. Rudi, Jakarta',
-                                  jenis: 'BUKA BUDI',
-                                  isPrioritas: true,
-                                  imageUrl:
-                                      'https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=600',
+                      child: Consumer<EventProvider>(
+                        builder: (context, eventProvider, _) {
+                          if (eventProvider.isLoading) {
+                            return const Center(child: CircularProgressIndicator(color: HomeScreen.primary));
+                          }
+                          
+                          if (eventProvider.error != null) {
+                            return Center(child: Text('Gagal memuat: ${eventProvider.error}'));
+                          }
+                          
+                          final events = eventProvider.events;
+                          
+                          return ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            itemCount: events.length + 1,
+                            separatorBuilder: (context, index) => const SizedBox(width: 12),
+                            itemBuilder: (context, index) {
+                              if (index == 0) {
+                                return _BuatAcaraCard();
+                              }
+                              final event = events[index - 1];
+                              // Simple date extraction (e.g. "Minggu, 24 Okt" -> "24 OKT")
+                              final dateParts = event.tanggal.split(' ');
+                              String shortDate = event.tanggal;
+                              if (dateParts.length >= 3) {
+                                shortDate = '${dateParts[1]} ${dateParts[2]}';
+                              }
+
+                              return GestureDetector(
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => InvitationDetailScreen(
+                                      namaAcara: event.nama,
+                                      namaHost: event.host,
+                                      tanggal: event.tanggal,
+                                      waktu: event.waktu,
+                                      lokasi: event.lokasi,
+                                      jenis: event.jenis.toUpperCase(),
+                                      isPrioritas: event.isBalasBudi,
+                                      imageUrl: event.imageUrl,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            child: _UndanganCard(
-                              nama: 'Areta & Fajar',
-                              tanggal: 'Sabtu, 09.00',
-                              jenis: 'BUKA BUDI',
-                              isHighlighted: true,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          // Undangan card 2
-                          GestureDetector(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const InvitationDetailScreen(
-                                  namaAcara: 'Khitanan Putra Bpk. Slamet',
-                                  namaHost: 'Bpk. Slamet Widodo',
-                                  tanggal: 'Minggu, 15 Sep 2025',
-                                  waktu: '08.00 - 13.00 WIB',
-                                  lokasi: 'Gedung Serbaguna Hl, Jakarta',
-                                  jenis: 'KHITANAN',
-                                  subtitle: 'Putra dari Bpk. Slamet Widodo',
-                                  imageUrl:
-                                      'https://images.unsplash.com/photo-1511895426328-dc8714191011?w=600',
+                                child: _UndanganCard(
+                                  nama: event.nama,
+                                  tanggal: shortDate.toUpperCase(),
+                                  jenis: event.jenis.toUpperCase(),
+                                  subtitle: event.lokasi,
+                                  isHighlighted: index == 1, // Highlight the first real event
                                 ),
-                              ),
-                            ),
-                            child: _UndanganCard(
-                              nama: 'Putra Bpk. Slamet',
-                              tanggal: '15 SEP',
-                              jenis: 'KHITANAN',
-                              subtitle: 'Gedung Serbaguna Hl',
-                              isHighlighted: false,
-                            ),
-                          ),
-                        ],
+                              );
+                            },
+                          );
+                        },
                       ),
                     ),
 
@@ -321,15 +335,87 @@ class _HomeScreenState extends State<HomeScreen> {
                     // ── Agenda Card ──────────────────────────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: _AgendaCard(),
+                      child: Consumer<EventProvider>(
+                        builder: (context, eventProvider, _) {
+                          if (eventProvider.isUpcomingLoading) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(32.0),
+                                child: CircularProgressIndicator(color: HomeScreen.primary),
+                              ),
+                            );
+                          }
+                          
+                          if (eventProvider.upcomingError != null) {
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  'Gagal memuat agenda: ${eventProvider.upcomingError}',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(color: HomeScreen.onSurfaceVariant),
+                                ),
+                              ),
+                            );
+                          }
+
+                          if (eventProvider.upcomingEvents.isEmpty) {
+                            return Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: HomeScreen.surfaceContainerLowest,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: HomeScreen.outlineVariant.withValues(alpha: 0.4),
+                                ),
+                              ),
+                              child: const Column(
+                                children: [
+                                  Icon(Icons.event_busy, size: 48, color: HomeScreen.outlineVariant),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'Belum ada agenda di sekitarmu',
+                                    style: TextStyle(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: HomeScreen.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          // Tampilkan agenda terdekat (item pertama)
+                          final event = eventProvider.upcomingEvents.first;
+                          return _AgendaCard(event: event);
+                        },
+                      ),
                     ),
                   ],
                 ),
               ),
+                  // Riwayat (Placeholder)
+                  const Center(
+                    child: Text(
+                      "Halaman Riwayat\n(Dalam Pengembangan)",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontFamily: 'Plus Jakarta Sans', color: HomeScreen.onSurfaceVariant),
+                    ),
+                  ),
+                  // Profil
+                  const ProfileScreen(),
+                ],
+              ),
             ),
 
             // ── Bottom Navigation Bar ────────────────────────────────────
-            _BottomNavBar(),
+            _BottomNavBar(
+              selectedIndex: _selectedIndex,
+              onItemTapped: (index) {
+                setState(() => _selectedIndex = index);
+              },
+            ),
           ],
         ),
       ),
@@ -522,8 +608,25 @@ class _UndanganCard extends StatelessWidget {
 
 // ── Agenda Card ─────────────────────────────────────────────────────────────
 class _AgendaCard extends StatelessWidget {
+  final EventModel event;
+
+  const _AgendaCard({required this.event});
+
   @override
   Widget build(BuildContext context) {
+    // Extract date for badge (e.g. "Minggu, 24 Okt" -> "OKT" and "24")
+    final dateParts = event.tanggal.split(' ');
+    String month = 'BLN';
+    String day = '--';
+    if (dateParts.length >= 3) {
+      day = dateParts[1];
+      month = dateParts[2].toUpperCase();
+    }
+
+    // Extract distance from lokasiDisplay (e.g. "Lokasi • 1.3km")
+    final lokasiParts = event.lokasiDisplay.split(' • ');
+    String distanceStr = lokasiParts.length > 1 ? lokasiParts[1] : '- km';
+
     return Container(
       decoration: BoxDecoration(
         color: HomeScreen.surfaceContainerLowest,
@@ -547,7 +650,7 @@ class _AgendaCard extends StatelessWidget {
                   top: Radius.circular(20),
                 ),
                 child: Image.network(
-                  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600',
+                  event.imageUrl,
                   height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -575,11 +678,11 @@ class _AgendaCard extends StatelessWidget {
                     color: HomeScreen.primaryContainer,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
                       Text(
-                        'OKT',
-                        style: TextStyle(
+                        month,
+                        style: const TextStyle(
                           fontFamily: 'Plus Jakarta Sans',
                           fontSize: 9,
                           fontWeight: FontWeight.w700,
@@ -588,8 +691,8 @@ class _AgendaCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '12',
-                        style: TextStyle(
+                        day,
+                        style: const TextStyle(
                           fontFamily: 'Plus Jakarta Sans',
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
@@ -613,10 +716,10 @@ class _AgendaCard extends StatelessWidget {
                 // Judul + jarak
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'Pernikahan Dimas & Ratna',
-                        style: TextStyle(
+                        event.nama,
+                        style: const TextStyle(
                           fontFamily: 'Plus Jakarta Sans',
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -635,9 +738,9 @@ class _AgendaCard extends StatelessWidget {
                         color: HomeScreen.primaryContainer,
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: const Text(
-                        '1.3km',
-                        style: TextStyle(
+                      child: Text(
+                        distanceStr,
+                        style: const TextStyle(
                           fontFamily: 'Plus Jakarta Sans',
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -651,17 +754,17 @@ class _AgendaCard extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 // Host
-                const Row(
+                Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.person_outline,
                       size: 14,
                       color: HomeScreen.onSurfaceVariant,
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Text(
-                      'Bpk. Bambang Hermawan',
-                      style: TextStyle(
+                      event.host,
+                      style: const TextStyle(
                         fontFamily: 'Plus Jakarta Sans',
                         fontSize: 12,
                         color: HomeScreen.onSurfaceVariant,
@@ -673,18 +776,18 @@ class _AgendaCard extends StatelessWidget {
                 const SizedBox(height: 6),
 
                 // Lokasi
-                const Row(
+                Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.location_on_outlined,
                       size: 14,
                       color: HomeScreen.onSurfaceVariant,
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        'Balai Sudirman, Tebet, Jakarta Selatan',
-                        style: TextStyle(
+                        event.lokasi,
+                        style: const TextStyle(
                           fontFamily: 'Plus Jakarta Sans',
                           fontSize: 12,
                           color: HomeScreen.onSurfaceVariant,
@@ -699,17 +802,17 @@ class _AgendaCard extends StatelessWidget {
                 const SizedBox(height: 6),
 
                 // Waktu
-                const Row(
+                Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.access_time_outlined,
                       size: 14,
                       color: HomeScreen.onSurfaceVariant,
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Text(
-                      '19.00 - 21.00 WIB',
-                      style: TextStyle(
+                      event.waktu,
+                      style: const TextStyle(
                         fontFamily: 'Plus Jakarta Sans',
                         fontSize: 12,
                         color: HomeScreen.onSurfaceVariant,
@@ -727,19 +830,17 @@ class _AgendaCard extends StatelessWidget {
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const InvitationDetailScreen(
-                          namaAcara: 'Pernikahan Dimas & Ratna',
-                          namaHost: 'Bpk. Bambang Hermawan',
-                          tanggal: 'Sabtu, 12 Okt 2024',
-                          waktu: '19.00 - 21.00 WIB',
-                          lokasi: 'Balai Sudirman, Tebet, Jakarta Selatan',
-                          jenis: 'PERNIKAHAN',
-                          subtitle:
-                              'Hajatan Keluarga Besar Bpk. Bambang Hermawan',
-                          isPrioritas: true,
-                          jarakKm: '1.3km',
-                          imageUrl:
-                              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600',
+                        builder: (_) => InvitationDetailScreen(
+                          namaAcara: event.nama,
+                          namaHost: event.host,
+                          tanggal: event.tanggal,
+                          waktu: event.waktu,
+                          lokasi: event.lokasiDisplay,
+                          jenis: event.jenis.toUpperCase(),
+                          subtitle: event.lokasi,
+                          isPrioritas: event.isBalasBudi,
+                          jarakKm: distanceStr,
+                          imageUrl: event.imageUrl,
                         ),
                       ),
                     ),
@@ -772,26 +873,16 @@ class _AgendaCard extends StatelessWidget {
 }
 
 // ── Bottom Navigation Bar ───────────────────────────────────────────────────
-class _BottomNavBar extends StatefulWidget {
-  @override
-  State<_BottomNavBar> createState() => _BottomNavBarState();
-}
+class _BottomNavBar extends StatelessWidget {
+  final int selectedIndex;
+  final ValueChanged<int> onItemTapped;
 
-class _BottomNavBarState extends State<_BottomNavBar> {
-  int _selected = 0;
+  const _BottomNavBar({required this.selectedIndex, required this.onItemTapped});
 
-  final _items = const [
+  static const _items = [
     {'icon': Icons.home_outlined, 'activeIcon': Icons.home, 'label': 'Beranda'},
-    {
-      'icon': Icons.history_outlined,
-      'activeIcon': Icons.history,
-      'label': 'Riwayat',
-    },
-    {
-      'icon': Icons.person_outline,
-      'activeIcon': Icons.person,
-      'label': 'Profil',
-    },
+    {'icon': Icons.history_outlined, 'activeIcon': Icons.history, 'label': 'Riwayat'},
+    {'icon': Icons.person_outline, 'activeIcon': Icons.person, 'label': 'Profil'},
   ];
 
   @override
@@ -813,9 +904,9 @@ class _BottomNavBarState extends State<_BottomNavBar> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(_items.length, (i) {
           final item = _items[i];
-          final isSelected = _selected == i;
+          final isSelected = selectedIndex == i;
           return GestureDetector(
-            onTap: () => setState(() => _selected = i),
+            onTap: () => onItemTapped(i),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),

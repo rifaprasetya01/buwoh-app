@@ -2,6 +2,23 @@ const prisma = require('../lib/prisma');
 const ApiError = require('../utils/ApiError');
 
 /**
+ * Helper: Fungsi Haversine untuk menghitung jarak antara 2 koordinat (dalam km)
+ */
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Radius bumi dalam km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
+/**
  * Helper: Serialize BigInt fields in event objects
  */
 const serializeEvent = (event) => {
@@ -24,6 +41,37 @@ const serializeEvent = (event) => {
   if (serialized._count) {
     serialized._count = serialized._count;
   }
+
+  // --- UI Formatting (Backend Follows Frontend) ---
+  const dStart = new Date(serialized.startDatetime);
+  const dEnd = new Date(serialized.endDatetime);
+  
+  const formatterTanggal = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' });
+  const formatterWaktu = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' });
+  
+  const formattedTanggal = formatterTanggal.format(dStart);
+  let formattedWaktuStart = formatterWaktu.format(dStart).replace(':', '.');
+  let formattedWaktuEnd = formatterWaktu.format(dEnd).replace(':', '.');
+  
+  let lokasiDisplay = `${serialized.locationName} • - km`;
+  if (serialized.distanceKm !== undefined) {
+    lokasiDisplay = `${serialized.locationName} • ${serialized.distanceKm.toFixed(1)}km`;
+  }
+  
+  serialized.ui = {
+    jenis: serialized.eventCategory?.name || 'Acara',
+    jenisColor: serialized.eventCategory?.name === 'Pernikahan' ? 0xFF705D00 : 0xFF134231,
+    nama: serialized.title,
+    host: serialized.user?.name || 'Tuan Rumah',
+    tanggal: formattedTanggal,
+    waktu: `${formattedWaktuStart} - ${formattedWaktuEnd} WIB`,
+    lokasi: serialized.locationName,
+    lokasiDisplay: lokasiDisplay,
+    imageUrl: serialized.coverImageUrl || 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=300',
+    isBalasBudi: false, // Default false, will be overridden if true
+    tag: serialized.eventCategory?.name || 'Acara'
+  };
+
   return serialized;
 };
 
@@ -114,14 +162,25 @@ const createEvent = async (userId, data) => {
 /**
  * List acara publik (published)
  */
-const listPublicEvents = async ({ page, limit, status, categoryId, search }) => {
+const listPublicEvents = async ({ page = 1, limit = 10, status, categoryId, search, upcoming, lat, lng }) => {
   const where = {};
+  page = parseInt(page) || 1;
+  limit = parseInt(limit) || 10;
 
   // Default: hanya tampilkan yang published
   where.status = status || 'published';
 
+  if (upcoming === 'true' || upcoming === true) {
+    const now = Date.now();
+    const nextWeek = new Date(now + 7 * 24 * 60 * 60 * 1000);
+    const yesterday = new Date(now - 1 * 24 * 60 * 60 * 1000);
+    
+    where.startDatetime = { lte: nextWeek };
+    where.endDatetime = { gte: yesterday };
+  }
+
   if (categoryId) {
-    where.eventCategoryId = categoryId;
+    where.eventCategoryId = parseInt(categoryId);
   }
 
   if (search) {
@@ -131,29 +190,59 @@ const listPublicEvents = async ({ page, limit, status, categoryId, search }) => 
     ];
   }
 
-  const skip = (page - 1) * limit;
-
-  const [events, total] = await Promise.all([
-    prisma.event.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { startDatetime: 'desc' },
-      include: {
-        eventCategory: true,
-        user: {
-          select: { id: true, name: true, profilePhotoUrl: true },
-        },
-        _count: {
-          select: { eventGuests: true },
-        },
+  let events = await prisma.event.findMany({
+    where,
+    orderBy: { startDatetime: 'asc' }, // By default sort by date for upcoming
+    include: {
+      eventCategory: true,
+      user: {
+        select: { id: true, name: true, profilePhotoUrl: true },
       },
-    }),
-    prisma.event.count({ where }),
-  ]);
+      _count: {
+        select: { eventGuests: true },
+      },
+    },
+  });
+
+  // Calculate distance if lat and lng are provided
+  if (lat !== undefined && lng !== undefined) {
+    const userLat = parseFloat(lat);
+    const userLng = parseFloat(lng);
+    
+    events = events.map(evt => {
+      const eLat = parseFloat(evt.locationLat);
+      const eLng = parseFloat(evt.locationLng);
+      
+      if (!isNaN(eLat) && !isNaN(eLng)) {
+        evt.distanceKm = calculateDistance(userLat, userLng, eLat, eLng);
+      }
+      return evt;
+    });
+
+    // Sort by distance
+    events.sort((a, b) => {
+      const distA = a.distanceKm ?? Infinity;
+      const distB = b.distanceKm ?? Infinity;
+      if (distA !== distB) return distA - distB;
+      return new Date(a.startDatetime) - new Date(b.startDatetime);
+    });
+  } else {
+    // If no lat/lng, sort by date descending for normal list, ascending for upcoming
+    events.sort((a, b) => {
+      if (upcoming === 'true' || upcoming === true) {
+         return new Date(a.startDatetime) - new Date(b.startDatetime);
+      }
+      return new Date(b.startDatetime) - new Date(a.startDatetime);
+    });
+  }
+
+  // Manual pagination after sorting
+  const total = events.length;
+  const skip = (page - 1) * limit;
+  const paginatedEvents = events.slice(skip, skip + limit);
 
   return {
-    events: events.map(serializeEvent),
+    events: paginatedEvents.map(serializeEvent),
     pagination: {
       page,
       limit,
