@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../widgets/widgets.dart';
+
 
 /// Buwoh - Splash Screen
 class BuwohSplashScreen extends StatefulWidget {
@@ -22,13 +24,13 @@ class _BuwohSplashScreenState extends State<BuwohSplashScreen>
   late final Animation<double> _titleOpacity;
   late final Animation<Offset> _subtitleSlide;
   late final Animation<double> _subtitleOpacity;
-  late final Animation<Offset> _bottomSlide;
-  late final Animation<double> _bottomOpacity;
+  // late final Animation<Offset> _bottomSlide;
+  // late final Animation<double> _bottomOpacity;
 
   static const _primary = Color(0xFF134231);
   static const _primaryContainer = Color(0xFF2D5A47);
   static const _onSurfaceVariant = Color(0xFF414944);
-  static const _outlineVariant = Color(0xFFC0C8C2);
+  // static const _outlineVariant = Color(0xFFC0C8C2);
   static const _tertiary = Color(0xFF705D00);
   static const _background = Color(0xFFF8FAF8);
 
@@ -70,10 +72,10 @@ class _BuwohSplashScreenState extends State<BuwohSplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    _bottomSlide = Tween(begin: const Offset(0.3, 0), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _bottomCtrl, curve: Curves.easeOut));
-    _bottomOpacity = Tween(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _bottomCtrl, curve: Curves.easeOut));
+    // _bottomSlide = Tween(begin: const Offset(0.3, 0), end: Offset.zero)
+    //     .animate(CurvedAnimation(parent: _bottomCtrl, curve: Curves.easeOut));
+    // _bottomOpacity = Tween(begin: 0.0, end: 1.0).animate(
+    //     CurvedAnimation(parent: _bottomCtrl, curve: Curves.easeOut));
 
     _runSequence();
   }
@@ -108,12 +110,12 @@ class _BuwohSplashScreenState extends State<BuwohSplashScreen>
           Positioned(
             top: -96,
             left: -96,
-            child: _GlowBlob(color: _primaryContainer.withValues(alpha: 0.05)),
+            child: BuwohGlowBlob(color: _primaryContainer.withValues(alpha: 0.065)),
           ),
           Positioned(
             bottom: -96,
             right: -96,
-            child: _GlowBlob(color: _tertiary.withValues(alpha: 0.05)),
+            child: BuwohGlowBlob(color: _tertiary.withValues(alpha: 0.065)),
           ),
           Center(
             child: Column(
@@ -128,7 +130,7 @@ class _BuwohSplashScreenState extends State<BuwohSplashScreen>
                       height: 96,
                       decoration: BoxDecoration(
                         color: _primaryContainer,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(100),
                         boxShadow: [
                           BoxShadow(
                             color: _primary.withValues(alpha: 0.20),
@@ -172,7 +174,7 @@ class _BuwohSplashScreenState extends State<BuwohSplashScreen>
                       'DIGITALISASI TRADISI HAJATAN',
                       style: TextStyle(
                         fontFamily: 'Plus Jakarta Sans',
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: _onSurfaceVariant,
                         letterSpacing: 2.4,
@@ -183,69 +185,10 @@ class _BuwohSplashScreenState extends State<BuwohSplashScreen>
               ],
             ),
           ),
-          Positioned(
-            bottom: 48,
-            left: 0,
-            right: 0,
-            child: SlideTransition(
-              position: _bottomSlide,
-              child: FadeTransition(
-                opacity: _bottomOpacity,
-                child: Column(
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 48,
-                        height: 1,
-                        color: _outlineVariant.withValues(alpha: 0.30),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _Dot(color: _primary.withValues(alpha: 0.20)),
-                        const SizedBox(width: 8),
-                        _Dot(color: _tertiary.withValues(alpha: 0.40)),
-                        const SizedBox(width: 8),
-                        _Dot(color: _primary.withValues(alpha: 0.20)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
 }
 
-class _GlowBlob extends StatelessWidget {
-  final Color color;
-  const _GlowBlob({required this.color});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 384,
-      height: 384,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-    );
-  }
-}
-
-class _Dot extends StatelessWidget {
-  final Color color;
-  const _Dot({required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 6,
-      height: 6,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-    );
-  }
-}
