@@ -65,205 +65,196 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Bottom gradient bar
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 6,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [_primary, _primaryContainer, _tertiary],
-                ),
-              ),
-            ),
-          ),
-
           // Main content
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-              child: Column(
-                children: [
-                  // ── Header ──────────────────────────────────────────────
-                  Column(
-                    children: [
-                      Container(
-                        width: 96,
-                        height: 96,
-                        decoration: BoxDecoration(
-                          color: _primaryContainer,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: _primary.withValues(alpha: 0.20),
-                              blurRadius: 32,
-                              offset: const Offset(0, 12),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.volunteer_activism,
-                          color: Colors.white,
-                          size: 48,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'Buwoh App',
-                        style: TextStyle(
-                          fontFamily: 'Plus Jakarta Sans',
-                          fontSize: 36,
-                          fontWeight: FontWeight.w800,
-                          color: _primary,
-                          letterSpacing: -1.0,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Masuk ke Akun',
-                        style: TextStyle(
-                          fontFamily: 'Plus Jakarta Sans',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: _onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 48),
-
-                  // ── Form Card ───────────────────────────────────────────
-                  Container(
-                    padding: const EdgeInsets.all(32),
-                    decoration: BoxDecoration(
-                      color: _surfaceContainerLowest,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF191C1B).withValues(alpha: 0.04),
-                          blurRadius: 40,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Email field
-                        const _FieldLabel('Alamat Email'),
-                        const SizedBox(height: 8),
-                        _InputField(
-                          controller: _emailCtrl,
-                          hintText: 'nama@email.com',
-                          prefixIcon: Icons.mail_outline,
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Password field
-                        const _FieldLabel('Kata Sandi'),
-                        const SizedBox(height: 8),
-                        _PasswordField(
-                          controller: _passwordCtrl,
-                          obscure: _obscurePassword,
-                          onToggle: () => setState(
-                              () => _obscurePassword = !_obscurePassword),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        // Forgot password
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                            child: const Text(
-                              'Lupa Kata Sandi?',
-                              style: TextStyle(
-                                fontFamily: 'Plus Jakarta Sans',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: _primary,
-                                letterSpacing: 0.3,
+          Positioned.fill(
+            child: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 500),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+                      child: Column(
+                        children: [
+                          // ── Header ──────────────────────────────────────────────
+                          Column(
+                            children: [
+                              Container(
+                                width: 96,
+                                height: 96,
+                                decoration: BoxDecoration(
+                                  color: _primaryContainer,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: _primary.withValues(alpha: 0.20),
+                                      blurRadius: 32,
+                                      offset: const Offset(0, 12),
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.volunteer_activism,
+                                  color: Colors.white,
+                                  size: 48,
+                                ),
                               ),
+                              const SizedBox(height: 24),
+                              const Text(
+                                'Buwoh App',
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.w800,
+                                  color: _primary,
+                                  letterSpacing: -1.0,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Masuk ke Akun',
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: _onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 48),
+
+                          // ── Form Card ───────────────────────────────────────────
+                          Container(
+                            padding: const EdgeInsets.all(32),
+                            decoration: BoxDecoration(
+                              color: _surfaceContainerLowest,
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF191C1B).withValues(alpha: 0.04),
+                                  blurRadius: 40,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Email field
+                                const _FieldLabel('Alamat Email'),
+                                const SizedBox(height: 8),
+                                _InputField(
+                                  controller: _emailCtrl,
+                                  hintText: 'nama@email.com',
+                                  prefixIcon: Icons.mail_outline,
+                                  keyboardType: TextInputType.emailAddress,
+                                ),
+
+                                const SizedBox(height: 24),
+
+                                // Password field
+                                const _FieldLabel('Kata Sandi'),
+                                const SizedBox(height: 8),
+                                _PasswordField(
+                                  controller: _passwordCtrl,
+                                  obscure: _obscurePassword,
+                                  onToggle: () => setState(
+                                      () => _obscurePassword = !_obscurePassword),
+                                ),
+
+                                const SizedBox(height: 12),
+
+                                // Forgot password
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {},
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: Size.zero,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: const Text(
+                                      'Lupa Kata Sandi?',
+                                      style: TextStyle(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: _primary,
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 24),
+
+                                // Login button
+                                _PrimaryButton(
+                                  label: 'Masuk Sekarang',
+                                  onPressed: () {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const HomeScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                           ),
-                        ),
 
-                        const SizedBox(height: 24),
+                          const SizedBox(height: 32),
 
-                        // Login button
-                        _PrimaryButton(
-                          label: 'Masuk Sekarang',
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const HomeScreen(),
+                          // ── Footer ──────────────────────────────────────────────
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Belum punya akun?',
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: _onSurfaceVariant,
+                                ),
                               ),
-                            );
-                          },
-                        ),
-
-
-                      ],
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const RegisterScreen(),
+                                    ),
+                                  );
+                                },
+                                style: TextButton.styleFrom(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 6),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: const Text(
+                                  'Daftar',
+                                  style: TextStyle(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: _primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
                     ),
                   ),
-
-                  const SizedBox(height: 32),
-
-                  // ── Footer ──────────────────────────────────────────────
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Belum punya akun?',
-                        style: TextStyle(
-                          fontFamily: 'Plus Jakarta Sans',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: _onSurfaceVariant,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const RegisterScreen(),
-                            ),
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 6),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        child: const Text(
-                          'Daftar',
-                          style: TextStyle(
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: _primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-                ],
+                ),
               ),
             ),
           ),

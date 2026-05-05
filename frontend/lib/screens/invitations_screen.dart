@@ -109,7 +109,7 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
     return Scaffold(
       backgroundColor: _background,
       appBar: AppBar(
-        backgroundColor: _background.withOpacity(0.82),
+        backgroundColor: _background.withValues(alpha: 0.82),
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -126,12 +126,7 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
             letterSpacing: -0.3,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: _primary),
-            onPressed: () {},
-          ),
-        ],
+
       ),
       body: Column(
         children: [
@@ -226,7 +221,7 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
                       children: [
                         Icon(Icons.search_off_outlined,
                             size: 56,
-                            color: _outline.withOpacity(0.4)),
+                            color: _outline.withValues(alpha: 0.4)),
                         const SizedBox(height: 12),
                         const Text(
                           'Tidak ada undangan ditemukan',

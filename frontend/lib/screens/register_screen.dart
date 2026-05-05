@@ -92,11 +92,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: Stack(
         children: [
           // ── Scrollable Content ─────────────────────────────────────────
-          SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 120),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          Positioned.fill(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 120),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                 // ── Profile Picture ──────────────────────────────────────
                 Center(
                   child: Column(
@@ -318,27 +322,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    ),
 
           // ── Bottom Nav Bar ─────────────────────────────────────────────
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.92),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32)),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF191C1B).withValues(alpha: 0.04),
-                    blurRadius: 40,
-                    offset: const Offset(0, -10),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.92),
+                    borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(32)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF191C1B).withValues(alpha: 0.04),
+                        blurRadius: 40,
+                        offset: const Offset(0, -10),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: Row(
+                  child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _BottomNavItem(
@@ -351,10 +361,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     label: 'Bantuan',
                     onTap: () {},
                   ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
+        ),
         ],
       ),
     );

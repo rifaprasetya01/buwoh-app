@@ -1,5 +1,18 @@
 import 'package:flutter/material.dart';
 
+// ── Color Tokens (Global Scope) ───────────────────────────────────────────
+const _primary = Color(0xFF134231);
+const _primaryContainer = Color(0xFF2D5A47);
+const _primaryFixed = Color(0xFFBCEDD4);
+const _onSurface = Color(0xFF191C1B);
+const _onSurfaceVariant = Color(0xFF414944);
+const _outlineVariant = Color(0xFFC0C8C2);
+const _surfaceContainerLow = Color(0xFFF2F4F2);
+const _surfaceContainerLowest = Color(0xFFFFFFFF);
+const _surfaceContainer = Color(0xFFECEEEC);
+const _tertiaryFixed = Color(0xFFFFE16D);
+const _background = Color(0xFFF8FAF8);
+
 class InvitationDetailScreen extends StatefulWidget {
   final String namaAcara;
   final String namaHost;
@@ -34,27 +47,13 @@ class InvitationDetailScreen extends StatefulWidget {
   });
 
   @override
-  State<InvitationDetailScreen> createState() =>
-      _InvitationDetailScreenState();
+  State<InvitationDetailScreen> createState() => _InvitationDetailScreenState();
 }
 
 class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
   bool _uang = false;
   bool _beras = false;
   bool _gula = false;
-
-  // Color Tokens
-  static const _primary = Color(0xFF134231);
-  static const _primaryContainer = Color(0xFF2D5A47);
-  static const _primaryFixed = Color(0xFFBCEDD4);
-  static const _onSurface = Color(0xFF191C1B);
-  static const _onSurfaceVariant = Color(0xFF414944);
-  static const _outlineVariant = Color(0xFFC0C8C2);
-  static const _surfaceContainerLow = Color(0xFFF2F4F2);
-  static const _surfaceContainerLowest = Color(0xFFFFFFFF);
-  static const _surfaceContainer = Color(0xFFECEEEC);
-  static const _tertiaryFixed = Color(0xFFFFE16D);
-  static const _background = Color(0xFFF8FAF8);
 
   void _ajukanBuwoh() {
     if (!_uang && !_beras && !_gula) {
@@ -64,7 +63,8 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
           backgroundColor: _primaryContainer,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(999)),
+            borderRadius: BorderRadius.circular(999),
+          ),
         ),
       );
       return;
@@ -86,8 +86,7 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
         ),
         backgroundColor: _primary,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(999)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
         duration: const Duration(seconds: 3),
       ),
@@ -102,7 +101,7 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
 
       // ── Top App Bar ────────────────────────────────────────────────────
       appBar: AppBar(
-        backgroundColor: _background.withOpacity(0.82),
+        backgroundColor: _background.withValues(alpha: 0.82),
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -124,8 +123,9 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
             child: CircleAvatar(
               radius: 20,
               backgroundColor: _primaryContainer,
-              backgroundImage:
-                  const NetworkImage('https://i.pravatar.cc/150?img=3'),
+              backgroundImage: const NetworkImage(
+                'https://i.pravatar.cc/150?img=3',
+              ),
             ),
           ),
         ],
@@ -135,12 +135,11 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.92),
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(20)),
+          color: Colors.white.withValues(alpha: 0.92),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF134231).withOpacity(0.06),
+              color: const Color(0xFF134231).withValues(alpha: 0.06),
               blurRadius: 40,
               offset: const Offset(0, -10),
             ),
@@ -167,7 +166,7 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
                 borderRadius: BorderRadius.circular(999),
               ),
               elevation: 4,
-              shadowColor: _primary.withOpacity(0.2),
+              shadowColor: _primary.withValues(alpha: 0.2),
             ),
           ),
         ),
@@ -182,8 +181,9 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius:
-                      const BorderRadius.vertical(bottom: Radius.circular(0)),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(0),
+                  ),
                   child: AspectRatio(
                     aspectRatio: 4 / 5,
                     child: Image.network(
@@ -191,8 +191,11 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
                         color: _surfaceContainerLow,
-                        child: const Icon(Icons.image_outlined,
-                            size: 64, color: _outlineVariant),
+                        child: const Icon(
+                          Icons.image_outlined,
+                          size: 64,
+                          color: _outlineVariant,
+                        ),
                       ),
                     ),
                   ),
@@ -204,7 +207,9 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
                     left: 20,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8),
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: _tertiaryFixed,
                         borderRadius: BorderRadius.circular(999),
@@ -212,8 +217,11 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.favorite,
-                              color: Color(0xFF221B00), size: 14),
+                          Icon(
+                            Icons.favorite,
+                            color: Color(0xFF221B00),
+                            size: 14,
+                          ),
                           SizedBox(width: 6),
                           Text(
                             'ACARA PRIORITAS',
@@ -241,7 +249,7 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          _primary.withOpacity(0.90),
+                          _primary.withValues(alpha: 0.90),
                           Colors.transparent,
                         ],
                       ),
@@ -252,14 +260,17 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
                         // Badge jenis acara
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           margin: const EdgeInsets.only(bottom: 10),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.20),
+                            color: Colors.white.withValues(alpha: 0.20),
                             borderRadius: BorderRadius.circular(999),
                             border: Border.all(
-                                color: Colors.white.withOpacity(0.4),
-                                width: 1),
+                              color: Colors.white.withValues(alpha: 0.4),
+                              width: 1,
+                            ),
                           ),
                           child: Text(
                             widget.jenis,
@@ -285,13 +296,12 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          widget.subtitle ??
-                              'Hajatan ${widget.namaHost}',
+                          widget.subtitle ?? 'Hajatan ${widget.namaHost}',
                           style: TextStyle(
                             fontFamily: 'Plus Jakarta Sans',
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: _primaryFixed.withOpacity(0.9),
+                            color: _primaryFixed.withValues(alpha: 0.9),
                           ),
                         ),
                       ],
@@ -396,93 +406,6 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
 
             const SizedBox(height: 20),
 
-            // ── Peta Lokasi ──────────────────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const Text(
-                        'Peta Lokasi',
-                        style: TextStyle(
-                          fontFamily: 'Plus Jakarta Sans',
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: _onSurface,
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                      Flexible(
-                        child: Text(
-                          widget.lokasi,
-                          style: const TextStyle(
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontSize: 12,
-                            color: _onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      height: 220,
-                      color: _surfaceContainer,
-                      child: Stack(
-                        children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Color(0xFFCFE3D5),
-                                  Color(0xFFB5CFC0),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                            ),
-                          ),
-                          CustomPaint(
-                            size: const Size(double.infinity, 220),
-                            painter: _MapGridPainter(),
-                          ),
-                          Center(
-                            child: Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: _primary,
-                                border:
-                                    Border.all(color: Colors.white, width: 4),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: _primary.withOpacity(0.4),
-                                    blurRadius: 16,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(Icons.location_on,
-                                  color: Colors.white, size: 24),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             const SizedBox(height: 24),
 
             // ── Pilih Jenis Buwoh ────────────────────────────────────────
@@ -551,13 +474,13 @@ class _InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16), // Slightly reduced padding
       decoration: BoxDecoration(
         color: const Color(0xFFFFFFFF),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF191C1B).withOpacity(0.04),
+            color: const Color(0xFF191C1B).withValues(alpha: 0.04),
             blurRadius: 40,
             offset: const Offset(0, 10),
           ),
@@ -568,18 +491,18 @@ class _InfoCard extends StatelessWidget {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 36, // Slightly smaller icon container
+                height: 36,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF2D5A47).withOpacity(0.10),
+                  color: const Color(0xFF2D5A47).withValues(alpha: 0.10),
                 ),
-                child:
-                    Icon(icon, color: const Color(0xFF134231), size: 22),
+                child: Icon(icon, color: const Color(0xFF134231), size: 18),
               ),
-              if (trailing != null) trailing!,
+              if (trailing != null) Flexible(child: trailing!),
             ],
           ),
           const SizedBox(height: 12),
@@ -587,7 +510,7 @@ class _InfoCard extends StatelessWidget {
             label,
             style: const TextStyle(
               fontFamily: 'Plus Jakarta Sans',
-              fontSize: 12,
+              fontSize: 11, // Slightly smaller label
               color: Color(0xFF414944),
               fontWeight: FontWeight.w500,
             ),
@@ -597,11 +520,13 @@ class _InfoCard extends StatelessWidget {
             title,
             style: const TextStyle(
               fontFamily: 'Plus Jakarta Sans',
-              fontSize: 14,
+              fontSize: 13, // Slightly smaller title
               fontWeight: FontWeight.w700,
               color: Color(0xFF191C1B),
               height: 1.3,
             ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
           ),
           if (subtitle != null) ...[
             const SizedBox(height: 4),
@@ -609,7 +534,7 @@ class _InfoCard extends StatelessWidget {
               subtitle!,
               style: const TextStyle(
                 fontFamily: 'Plus Jakarta Sans',
-                fontSize: 12,
+                fontSize: 11,
                 color: Color(0xFF414944),
               ),
             ),
@@ -643,13 +568,11 @@ class _BuwohCheckItem extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: value
-              ? const Color(0xFF134231).withOpacity(0.05)
+              ? const Color(0xFF134231).withValues(alpha: 0.05)
               : const Color(0xFFFFFFFF),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: value
-                ? const Color(0xFF134231)
-                : const Color(0xFFC0C8C2),
+            color: value ? const Color(0xFF134231) : const Color(0xFFC0C8C2),
             width: 2,
           ),
         ),
@@ -661,9 +584,7 @@ class _BuwohCheckItem extends StatelessWidget {
               height: 24,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
-                color: value
-                    ? const Color(0xFF134231)
-                    : Colors.transparent,
+                color: value ? const Color(0xFF134231) : Colors.transparent,
                 border: Border.all(
                   color: value
                       ? const Color(0xFF134231)
@@ -692,33 +613,4 @@ class _BuwohCheckItem extends StatelessWidget {
       ),
     );
   }
-}
-
-// ── Map Grid Painter ────────────────────────────────────────────────────────
-class _MapGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final gridPaint = Paint()
-      ..color = Colors.white.withOpacity(0.25)
-      ..strokeWidth = 1;
-    for (double x = 0; x < size.width; x += 40) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
-    }
-    for (double y = 0; y < size.height; y += 40) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
-    }
-    final roadPaint = Paint()
-      ..color = Colors.white.withOpacity(0.55)
-      ..strokeWidth = 8
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(Offset(0, size.height * 0.45),
-        Offset(size.width, size.height * 0.45), roadPaint);
-    canvas.drawLine(Offset(size.width * 0.35, 0),
-        Offset(size.width * 0.35, size.height), roadPaint);
-    canvas.drawLine(Offset(size.width * 0.72, 0),
-        Offset(size.width * 0.72, size.height), roadPaint);
-  }
-
-  @override
-  bool shouldRepaint(_) => false;
 }
