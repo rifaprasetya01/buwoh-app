@@ -15,3 +15,5 @@ Format:
 [05-05-2026, 16:00:00]: Melakukan modularisasi besar-besaran komponen UI (cards, list_items, navigation) serta mengekstrak warna hardcoded ke AppColors (frontend)
 [05-05-2026, 16:15:00]: Memperbaiki masalah IDE (seperti missing braces, pemakaian underscore ganda di callback) dan me-migrate penggunaan .withOpacity yang deprecated menjadi .withValues (frontend)
 [05-05-2026, 16:20:00]: Membersihkan unused variables dan unused class (_BottomNav) di berbagai screen dengan memberikan komentar agar kode lebih bersih dari warning (frontend)
+[05-05-2026, 16:45:00]: Memperbarui UI Bottom Navbar dengan menyamakan proporsi lebar dan tinggi tiap menu serta melakukan penyesuaian gaya tampilan saat aktif (frontend)
+
