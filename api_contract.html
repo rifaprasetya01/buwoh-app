@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuwohApp - API Contract Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #134231;
+            --primary-light: #2D5A47;
+            --tertiary: #705D00;
+            --tertiary-fixed: #FFE16D;
+            --background: #0D1110;
+            --surface: #191C1B;
+            --on-surface: #E1E3E1;
+            --on-surface-variant: #C0C8C2;
+            --outline: #8B938D;
+            --error: #FFB4AB;
+            --code-bg: #121413;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--background);
+            color: var(--on-surface);
+            line-height: 1.6;
+            padding-bottom: 100px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), #0a251b);
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--on-surface-variant);
+            font-size: 14px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--tertiary-fixed);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .endpoint {
+            background-color: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.2s;
+        }
+
+        .endpoint:hover {
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .method {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .method.post { background-color: #2D5A47; color: #BCEDD4; }
+        .method.get { background-color: #004A77; color: #C2E8FF; }
+        .method.put { background-color: #705D00; color: #FFE16D; }
+
+        .path {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--on-surface);
+        }
+
+        .description {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .code-block {
+            background-color: var(--code-bg);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .code-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--outline);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            color: #d1d1d1;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--outline);
+            font-size: 12px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>BUWOH APP API</h1>
+        <p>Pre-Backend Preparation Contract. Dokumen ini mendefinisikan struktur pertukaran data antara aplikasi mobile (Frontend) dan API server (Backend).</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Authentication Section -->
+        <div class="section">
+            <h2 class="section-title">Authentication</h2>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/v1/auth/register</span>
+                </div>
+                <p class="description">Mendaftarkan pengguna baru menggunakan email dan kata sandi.</p>
+                <div class="grid">
+                    <div class="code-block">
+                        <div class="code-label">Request Body</div>
+<pre>{
+  "email": "user@email.com",
+  "password": "secure_password",
+  "password_confirmation": "secure_password"
+}</pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-label">Success Response (201)</div>
+<pre>{
+  "status": "success",
+  "message": "User registered",
+  "data": {
+    "token": "eyJhbGci..."
+  }
+}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/v1/auth/login</span>
+                </div>
+                <p class="description">Autentikasi pengguna dan mendapatkan token akses.</p>
+                <div class="grid">
+                    <div class="code-block">
+                        <div class="code-label">Request Body</div>
+<pre>{
+  "email": "user@email.com",
+  "password": "password123"
+}</pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-label">Success Response (200)</div>
+<pre>{
+  "status": "success",
+  "data": {
+    "token": "eyJhbGci...",
+    "user": { "id": 1, "name": "Budi" }
+  }
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile Section -->
+        <div class="section">
+            <h2 class="section-title">User Profile</h2>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/v1/user/profile</span>
+                </div>
+                <p class="description">Mendapatkan data profil lengkap pengguna yang sedang login.</p>
+                <div class="grid">
+                    <div class="code-block">
+                        <div class="code-label">Headers</div>
+<pre>Authorization: Bearer [token]</pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-label">Response (200)</div>
+<pre>{
+  "name": "Rifa Prasetya",
+  "address": "Sleman, Yogyakarta",
+  "photo_url": "https://...",
+  "stats": {
+    "total_buwoh": 15,
+    "total_events": 3
+  }
+}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method put">PUT</span>
+                    <span class="path">/api/v1/user/profile</span>
+                </div>
+                <p class="description">Memperbarui informasi profil pengguna.</p>
+                <div class="grid">
+                    <div class="code-block">
+                        <div class="code-label">Request Body (Multipart)</div>
+<pre>{
+  "name": "New Name",
+  "address": "New Sleman",
+  "photo": [binary_file]
+}</pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-label">Response (200)</div>
+<pre>{
+  "status": "success",
+  "message": "Profile updated"
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="section">
+            <h2 class="section-title">History / Contributions</h2>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/v1/history?filter=Uang&query=dian</span>
+                </div>
+                <p class="description">Mendapatkan daftar riwayat kontribusi (buwoh). Mendukung filter kategori dan pencarian nama/acara.</p>
+                <div class="grid">
+                    <div class="code-block">
+                        <div class="code-label">Query Parameters</div>
+<pre>filter: "Semua" | "Uang" | "Beras" | "Gula"
+query: string (search term)</pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-label">Response Data Item</div>
+<pre>{
+  "id": "uuid",
+  "jenis": "Hajatan Pernikahan",
+  "is_balas_budi": true,
+  "tanggal": "10 Nov 2023",
+  "nama_acara": "Resepsi Bagus & Siti",
+  "host": "Bapak Slamet",
+  "kontribusi": [
+    { "type": "uang", "label": "Rp 300.000" }
+  ],
+  "status": "diterima",
+  "tags": ["Uang"]
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Section -->
+        <div class="section">
+            <h2 class="section-title">Events Management</h2>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/v1/events</span>
+                </div>
+                <p class="description">Membuat acara (hajatan) baru oleh pengguna.</p>
+                <div class="grid">
+                    <div class="code-block">
+                        <div class="code-label">Request Body</div>
+<pre>{
+  "title": "Syukuran Kelahiran",
+  "date": "2024-05-20",
+  "location": "Gamping, Sleman",
+  "description": "..."
+}</pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-label">Response (201)</div>
+<pre>{
+  "status": "success",
+  "data": { "event_id": 101 }
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Buwoh Mobile App Architecture © 2026. Prepared for Advanced Agentic Coding.
+    </div>
+
+</body>
+</html>
