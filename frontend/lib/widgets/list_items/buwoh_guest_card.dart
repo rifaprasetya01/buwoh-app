@@ -7,6 +7,7 @@ class BuwohPendingGuestCard extends StatelessWidget {
   final String relasi;
   final IconData kontribusiIcon;
   final String kontribusi;
+  final VoidCallback onTolak;
   final VoidCallback onTerima;
 
   const BuwohPendingGuestCard({
@@ -16,6 +17,7 @@ class BuwohPendingGuestCard extends StatelessWidget {
     required this.relasi,
     required this.kontribusiIcon,
     required this.kontribusi,
+    required this.onTolak,
     required this.onTerima,
   });
 
@@ -127,22 +129,22 @@ class BuwohPendingGuestCard extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: onTolak,
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(999),
                     ),
-                    side: const BorderSide(color: AppColors.surfaceContainerHigh),
-                    backgroundColor: AppColors.surfaceContainerHigh,
+                    side: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
+                    backgroundColor: Colors.red.withValues(alpha: 0.05),
                   ),
                   child: const Text(
-                    'Edit',
+                    'Tolak',
                     style: TextStyle(
                       fontFamily: 'Plus Jakarta Sans',
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
+                      color: Colors.red,
                     ),
                   ),
                 ),

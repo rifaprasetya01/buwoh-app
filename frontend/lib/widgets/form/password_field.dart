@@ -20,6 +20,9 @@ class BuwohPasswordField extends StatelessWidget {
     return TextField(
       controller: controller,
       obscureText: obscure,
+      enableSuggestions: false,
+      autocorrect: false,
+      autofillHints: const <String>[],
       style: const TextStyle(
         fontFamily: 'Plus Jakarta Sans',
         fontSize: 15,

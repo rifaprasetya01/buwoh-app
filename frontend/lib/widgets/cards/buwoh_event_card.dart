@@ -6,9 +6,11 @@ class BuwohEventCard extends StatelessWidget {
   final String lokasi;
   final bool isPrioritas;
   final String tamu;
-  final String progres;
   final String waktu;
+  final String tanggal;
+  final String countdown;
   final String imageUrl;
+  final String? status;
   final VoidCallback onManage;
 
   const BuwohEventCard({
@@ -17,14 +19,27 @@ class BuwohEventCard extends StatelessWidget {
     required this.lokasi,
     required this.isPrioritas,
     required this.tamu,
-    required this.progres,
     required this.waktu,
+    required this.tanggal,
+    required this.countdown,
     required this.imageUrl,
+    this.status,
     required this.onManage,
   });
 
   @override
   Widget build(BuildContext context) {
+    Color statusBgColor = AppColors.primaryFixed;
+    Color statusTextColor = AppColors.onPrimaryFixed;
+
+    if (status?.toLowerCase() == 'segera hadir') {
+      statusBgColor = Colors.orange.shade100;
+      statusTextColor = Colors.orange.shade900;
+    } else if (status?.toLowerCase() == 'selesai') {
+      statusBgColor = Colors.red.shade100;
+      statusTextColor = Colors.red.shade900;
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -50,7 +65,7 @@ class BuwohEventCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: SizedBox(
                   width: 64,
-                  height: 64,
+                  height: 90,
                   child: Image.network(
                     imageUrl,
                     fit: BoxFit.cover,
@@ -69,39 +84,65 @@ class BuwohEventCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (isPrioritas)
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 6),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.tertiaryFixed,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.favorite,
-                              size: 10,
-                              color: AppColors.onTertiaryFixed,
+                    Row(
+                      children: [
+                        if (status != null)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 6, right: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
                             ),
-                            SizedBox(width: 4),
-                            Text(
-                              'PRIORITAS',
+                            decoration: BoxDecoration(
+                              color: statusBgColor,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              status!.toUpperCase(),
                               style: TextStyle(
                                 fontFamily: 'Plus Jakarta Sans',
                                 fontSize: 9,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.onTertiaryFixed,
+                                color: statusTextColor,
                                 letterSpacing: 0.8,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        if (isPrioritas)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.tertiaryFixed,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.favorite,
+                                  size: 10,
+                                  color: AppColors.onTertiaryFixed,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  'PRIORITAS',
+                                  style: TextStyle(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.onTertiaryFixed,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                     Text(
                       nama,
                       style: const TextStyle(
@@ -133,6 +174,45 @@ class BuwohEventCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.calendar_today_outlined,
+                          size: 13,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          tanggal,
+                          style: const TextStyle(
+                            fontFamily: 'Plus Jakarta Sans',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
+                        if (countdown.isNotEmpty) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryContainer.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              countdown,
+                              style: const TextStyle(
+                                fontFamily: 'Plus Jakarta Sans',
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -154,8 +234,6 @@ class BuwohEventCard extends StatelessWidget {
             child: Row(
               children: [
                 _StatItem(label: 'TAMU', value: tamu),
-                _Divider(),
-                _StatItem(label: 'PROGRES', value: progres),
                 _Divider(),
                 _StatItem(label: 'WAKTU', value: waktu),
               ],

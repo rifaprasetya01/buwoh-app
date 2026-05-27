@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 /// A primary action button with standard app styling.
 class BuwohPrimaryButton extends StatelessWidget {
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   const BuwohPrimaryButton({
     super.key,
     required this.label,
-    required this.onPressed,
+    this.onPressed,
   });
 
   @override

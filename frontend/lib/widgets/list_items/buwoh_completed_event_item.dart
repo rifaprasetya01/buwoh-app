@@ -5,6 +5,7 @@ class BuwohCompletedEventItem extends StatelessWidget {
   final String nama;
   final String info;
   final String total;
+  final String? status;
   final VoidCallback onRecapTap;
 
   const BuwohCompletedEventItem({
@@ -12,6 +13,7 @@ class BuwohCompletedEventItem extends StatelessWidget {
     required this.nama,
     required this.info,
     required this.total,
+    this.status,
     required this.onRecapTap,
   });
 
@@ -43,6 +45,28 @@ class BuwohCompletedEventItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (status != null)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      status!.toUpperCase(),
+                      style: const TextStyle(
+                        fontFamily: 'Plus Jakarta Sans',
+                        fontSize: 8,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.onSurfaceVariant,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
                 Text(
                   nama,
                   style: const TextStyle(

@@ -33,7 +33,7 @@ class BuwohBottomNavBar extends StatelessWidget {
         padding: const EdgeInsets.only(left: 16, right: 16, top: 6, bottom: 8),
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLowest,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          // borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           boxShadow: [
             BoxShadow(
               color: AppColors.onSurface.withValues(alpha: 0.1),
@@ -68,14 +68,14 @@ class BuwohBottomNavBar extends StatelessWidget {
                             ? _items[i]['activeIcon'] as IconData
                             : _items[i]['icon'] as IconData,
                         color: isSelected ? AppColors.background : AppColors.onSurfaceVariant,
-                        size: 32,
+                        size: 24,
                       ),
                       // const SizedBox(height: 4),
                       Text(
                         _items[i]['label'] as String,
                         style: TextStyle(
                           fontFamily: 'Plus Jakarta Sans',
-                          fontSize: 14,
+                          fontSize: 12,
                           fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                           color: isSelected ? AppColors.background : AppColors.onSurfaceVariant,
                         ),

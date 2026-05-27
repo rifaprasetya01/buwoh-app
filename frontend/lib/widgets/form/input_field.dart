@@ -20,6 +20,9 @@ class BuwohInputField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
+      enableSuggestions: false,
+      autocorrect: false,
+      autofillHints: const <String>[],
       style: const TextStyle(
         fontFamily: 'Plus Jakarta Sans',
         fontSize: 15,
