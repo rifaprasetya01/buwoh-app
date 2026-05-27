@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Aplikasi ini memerlukan akses lokasi untuk mendapatkan koordinat alamat Anda.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Aplikasi ini memerlukan akses lokasi untuk mendapatkan koordinat alamat Anda.</string>
 </dict>
 </plist>
