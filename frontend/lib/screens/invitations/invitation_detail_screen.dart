@@ -358,7 +358,7 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
                     return Image.network(
                       photoUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(
+                      errorBuilder: (_, _, _) => const Icon(
                         Icons.person,
                         color: Colors.white,
                         size: 20,
@@ -370,7 +370,7 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
                     return Image.network(
                       fullUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(
+                      errorBuilder: (_, _, _) => const Icon(
                         Icons.person,
                         color: Colors.white,
                         size: 20,
@@ -380,7 +380,7 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
                   return Image.file(
                     File(photoUrl),
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Icon(
+                    errorBuilder: (_, _, _) => const Icon(
                       Icons.person,
                       color: Colors.white,
                       size: 20,
@@ -490,7 +490,7 @@ class _InvitationDetailScreenState extends State<InvitationDetailScreen> {
                     child: Image.network(
                       _formatImageUrl(),
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (_, _, _) => Container(
                         color: _surfaceContainerLow,
                         child: const Icon(
                           Icons.image_outlined,

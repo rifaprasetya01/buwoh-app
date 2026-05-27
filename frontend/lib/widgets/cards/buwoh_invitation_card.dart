@@ -181,7 +181,7 @@ class BuwohInvitationCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                jarakKm != null ? '${jarakKm} km' : '-',
+                                jarakKm != null ? '$jarakKm km' : '-',
                                 style: const TextStyle(
                                   fontFamily: 'Plus Jakarta Sans',
                                   fontSize: 11,

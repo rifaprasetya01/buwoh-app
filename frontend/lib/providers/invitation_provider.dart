@@ -25,7 +25,7 @@ class InvitationProvider with ChangeNotifier {
       if (type != null && type != 'Semua') params.add('type=$type');
       
       if (params.isNotEmpty) {
-        endpoint += '?' + params.join('&');
+        endpoint += '?${params.join('&')}';
       }
 
       final response = await ApiService.get(endpoint);

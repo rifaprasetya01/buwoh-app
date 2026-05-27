@@ -292,7 +292,7 @@ class _InvitationCard extends StatelessWidget {
                             ? invitation.imageUrl
                             : '${ApiConfig.baseUrl.replaceAll('/api/v1', '')}${invitation.imageUrl}',
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
+                        errorBuilder: (_, _, _) => Container(
                           color: const Color(0xFFE6E9E7),
                           child: const Icon(
                             Icons.image_outlined,
@@ -442,7 +442,7 @@ class _InvitationCard extends StatelessWidget {
                     children: [
                       Icon(Icons.favorite, size: 12, color: Color(0xFF221B00)),
                       SizedBox(width: 4),
-                      const Text(
+                      Text(
                         'BALAS BUDI',
                         style: TextStyle(
                           fontFamily: 'Plus Jakarta Sans',

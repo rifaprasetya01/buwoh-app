@@ -34,7 +34,6 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
 
   static const _primary = Color(0xFF134231);
   static const _primaryContainer = Color(0xFF2D5A47);
-  static const _onSurface = Color(0xFF191C1B);
   static const _onSurfaceVariant = Color(0xFF414944);
   static const _tertiary = Color(0xFF705D00);
   static const _background = Color(0xFFF8FAF8);
@@ -95,6 +94,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                       ).then((value) {
                         if (value == true) {
                           // Ideally we should pop or reload history. Since history fetches on focus, it might be fine to just pop.
+                          if (!context.mounted) return;
                           Navigator.pop(context, true);
                         }
                       });
@@ -126,11 +126,13 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) {
           if (notification.direction == ScrollDirection.reverse) {
-            if (_isBottomNavVisible)
+            if (_isBottomNavVisible) {
               setState(() => _isBottomNavVisible = false);
+            }
           } else if (notification.direction == ScrollDirection.forward) {
-            if (!_isBottomNavVisible)
+            if (!_isBottomNavVisible) {
               setState(() => _isBottomNavVisible = true);
+            }
           }
           return false;
         },

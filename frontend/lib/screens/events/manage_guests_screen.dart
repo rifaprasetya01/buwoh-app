@@ -62,6 +62,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
 
     final provider = Provider.of<EventsProvider>(context, listen: false);
     final success = await provider.updateGuestStatus(widget.eventId, guestId, status);
+    if (!mounted) return;
     if (success) {
       BuwohDialogs.showSuccess(context, successMessage);
       _loadGuests(); // Reload lists
@@ -257,7 +258,7 @@ class _ManageGuestsScreenState extends State<ManageGuestsScreen> {
                     final provider = Provider.of<EventsProvider>(context, listen: false);
                     final success = await provider.addManualGuest(widget.eventId, email, contributions);
 
-                    if (!mounted) return;
+                    if (!context.mounted) return;
                     if (success) {
                       BuwohDialogs.showSuccess(context, 'Tamu manual berhasil ditambahkan sebagai Calon Tamu!');
                       _loadGuests();

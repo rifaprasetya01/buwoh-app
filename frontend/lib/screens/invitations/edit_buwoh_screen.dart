@@ -199,11 +199,11 @@ class _EditBuwohScreenState extends State<EditBuwohScreen> {
           : Container(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 56),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.92),
+                color: Colors.white.withValues(alpha: 0.92),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF134231).withOpacity(0.06),
+                    color: const Color(0xFF134231).withValues(alpha: 0.06),
                     blurRadius: 40,
                     offset: const Offset(0, -10),
                   ),
@@ -241,7 +241,7 @@ class _EditBuwohScreenState extends State<EditBuwohScreen> {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         elevation: 4,
-                        shadowColor: _primary.withOpacity(0.2),
+                        shadowColor: _primary.withValues(alpha: 0.2),
                       ),
                     );
                   }
@@ -292,7 +292,7 @@ class _EditBuwohScreenState extends State<EditBuwohScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: _primaryContainer.withOpacity(0.1),
+                          color: _primaryContainer.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(
@@ -393,7 +393,7 @@ class _BuwohCheckItem extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF191C1B).withOpacity(0.04),
+            color: const Color(0xFF191C1B).withValues(alpha: 0.04),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -407,8 +407,8 @@ class _BuwohCheckItem extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
-                fillColor: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.selected)) {
+                fillColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
                     return const Color(0xFF134231);
                   }
                   return Colors.transparent;

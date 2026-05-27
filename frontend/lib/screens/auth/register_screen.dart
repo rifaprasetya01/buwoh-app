@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
-import 'login_screen.dart';
-import '../dashboard/home_screen.dart';
 import '../../widgets/widgets.dart';
 import '../../utils/buwoh_dialogs.dart';
 
@@ -57,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _confirmPasswordCtrl.text,
     );
 
-    if (!mounted) return;
+    if (!context.mounted) return;
 
     // Navigation handled by AuthWrapper in main.dart
     // But if we were pushed as a route, we should pop to return to the root

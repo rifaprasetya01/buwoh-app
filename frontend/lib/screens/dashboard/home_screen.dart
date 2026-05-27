@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 // import 'package:flutter/rendering.dart';
 import 'package:dotted_border/dotted_border.dart';
 import '../events/create_event_screen.dart';
-import './dashboard_screen.dart';
 import './search_screen.dart';
 import '../../config/api_config.dart';
 import '../invitations/invitation_detail_screen.dart';
@@ -19,7 +17,6 @@ import '../../providers/auth_provider.dart';
 import '../../providers/events_provider.dart';
 import '../../providers/invitation_provider.dart';
 import '../../models/user_model.dart';
-import '../../models/invitation_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -178,7 +175,7 @@ class _HomeContentState extends State<_HomeContent> {
                                           return Image.network(
                                             photoUrl,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) =>
+                                            errorBuilder: (_, _, _) =>
                                                 const Icon(
                                                   Icons.person,
                                                   color: Colors.white,
@@ -192,7 +189,7 @@ class _HomeContentState extends State<_HomeContent> {
                                           return Image.network(
                                             fullUrl,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) =>
+                                            errorBuilder: (_, _, _) =>
                                                 const Icon(
                                                   Icons.person,
                                                   color: Colors.white,
@@ -203,7 +200,7 @@ class _HomeContentState extends State<_HomeContent> {
                                         return Image.file(
                                           File(photoUrl),
                                           fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) =>
+                                          errorBuilder: (_, _, _) =>
                                               const Icon(
                                                 Icons.person,
                                                 color: Colors.white,

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'edit_profile_screen.dart';
 import '../dashboard/dashboard_screen.dart';

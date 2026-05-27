@@ -18,11 +18,7 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    if (json.containsKey('stats')) {
-      print('UserModel stats received: ${json['stats']}');
-    } else {
-      print('UserModel stats MISSING in JSON');
-    }
+
     return UserModel(
       id: json['id'],
       name: json['name'],
