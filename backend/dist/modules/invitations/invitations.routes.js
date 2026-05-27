@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const invitations_controller_1 = require("./invitations.controller");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const validate_middleware_1 = require("../../middlewares/validate.middleware");
+const invitations_schema_1 = require("./invitations.schema");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateToken);
+router.get('/', invitations_controller_1.InvitationsController.listInvitations);
+router.get('/:eventId', invitations_controller_1.InvitationsController.getInvitationDetails);
+router.post('/:eventId/buwoh', (0, validate_middleware_1.validate)(invitations_schema_1.submitBuwohSchema), invitations_controller_1.InvitationsController.submitBuwoh);
+exports.default = router;
