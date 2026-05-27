@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
-import 'register_screen.dart';
-import 'home_screen.dart';
-import '../widgets/widgets.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
+import 'login_screen.dart';
+import '../dashboard/home_screen.dart';
+import '../../widgets/widgets.dart';
+import '../../utils/buwoh_dialogs.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
+  final _confirmPasswordCtrl = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   // Color Tokens
   static const _primary = Color(0xFF134231);
@@ -21,24 +27,60 @@ class _LoginScreenState extends State<LoginScreen> {
   static const _primaryFixed = Color(0xFFBCEDD4);
   static const _secondaryFixed = Color(0xFFC5EBD9);
   static const _onSurfaceVariant = Color(0xFF414944);
-  // static const _outlineVariant = Color(0xFFC0C8C2);
-  // static const _outline = Color(0xFF717974);
   static const _surfaceContainerLowest = Color(0xFFFFFFFF);
   static const _background = Color(0xFFF8FAF8);
-  // static const _tertiary = Color(0xFF705D00);
 
   @override
   void dispose() {
+    _nameCtrl.dispose();
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
+    _confirmPasswordCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleRegister(BuildContext context, AuthProvider auth) async {
+    if (_nameCtrl.text.isEmpty || _emailCtrl.text.isEmpty || _passwordCtrl.text.isEmpty) {
+      BuwohDialogs.showWarning(context, 'Harap isi semua bidang');
+      return;
+    }
+
+    if (_passwordCtrl.text != _confirmPasswordCtrl.text) {
+      BuwohDialogs.showWarning(context, 'Kata sandi tidak cocok');
+      return;
+    }
+
+    final success = await auth.register(
+      _nameCtrl.text.trim(),
+      _emailCtrl.text.trim(),
+      _passwordCtrl.text,
+      _confirmPasswordCtrl.text,
+    );
+
+    if (!mounted) return;
+
+    // Navigation handled by AuthWrapper in main.dart
+    // But if we were pushed as a route, we should pop to return to the root
+    if (success) {
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+      return;
+    }
+
+    BuwohDialogs.showError(
+      context,
+      'Pendaftaran gagal. Silakan coba lagi.',
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _background,
-      body: Stack(
+      body: Consumer<AuthProvider>(
+        builder: (context, auth, _) {
+          return Stack(
         children: [
           Positioned(
             top: -96,
@@ -103,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(height: 8),
                               const Text(
-                                'Masuk ke Akun',
+                                'Daftar Sekarang Juga',
                                 style: TextStyle(
                                   fontFamily: 'Plus Jakarta Sans',
                                   fontSize: 16,
@@ -135,15 +177,26 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Email field
-                                const BuwohFieldLabel('Email'),
-                                const SizedBox(height: 8),
-                                BuwohInputField(
-                                  controller: _emailCtrl,
-                                  hintText: 'nama@email.com',
-                                  prefixIcon: Icons.email_outlined,
-                                  keyboardType: TextInputType.emailAddress,
-                                ),
+                                    // Name field
+                                    const BuwohFieldLabel('Nama Lengkap'),
+                                    const SizedBox(height: 8),
+                                    BuwohInputField(
+                                      controller: _nameCtrl,
+                                      hintText: 'Nama Lengkap Anda',
+                                      prefixIcon: Icons.person_outline,
+                                    ),
+
+                                    const SizedBox(height: 24),
+
+                                    // Email field
+                                    const BuwohFieldLabel('Email'),
+                                    const SizedBox(height: 8),
+                                    BuwohInputField(
+                                      controller: _emailCtrl,
+                                      hintText: 'nama@email.com',
+                                      prefixIcon: Icons.email_outlined,
+                                      keyboardType: TextInputType.emailAddress,
+                                    ),
 
                                 const SizedBox(height: 24),
 
@@ -158,45 +211,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
 
-                                const SizedBox(height: 12),
+                                const SizedBox(height: 24),
 
-                                // Forgot password
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: TextButton(
-                                    onPressed: () {},
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      minimumSize: Size.zero,
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                    child: const Text(
-                                      'Lupa Kata Sandi?',
-                                      style: TextStyle(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                        color: _primary,
-                                        letterSpacing: 0.3,
-                                      ),
-                                    ),
+                                // Confirm Password field
+                                const BuwohFieldLabel('Konfirmasi Kata Sandi'),
+                                const SizedBox(height: 8),
+                                BuwohPasswordField(
+                                  controller: _confirmPasswordCtrl,
+                                  obscure: _obscureConfirmPassword,
+                                  onToggle: () => setState(
+                                    () => _obscureConfirmPassword =
+                                        !_obscureConfirmPassword,
                                   ),
                                 ),
 
-                                const SizedBox(height: 24),
+                                const SizedBox(height: 32),
 
-                                // Login button
+                                // Register button
                                 BuwohPrimaryButton(
-                                  label: 'Masuk',
-                                  onPressed: () {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const HomeScreen(),
-                                      ),
-                                    );
-                                  },
+                                  label: auth.isLoading ? 'Memproses...' : 'Daftar',
+                                  onPressed: auth.isLoading 
+                                    ? null 
+                                    : () => _handleRegister(context, auth),
                                 ),
                               ],
                             ),
@@ -209,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text(
-                                'Belum punya akun?',
+                                'Sudah punya akun?',
                                 style: TextStyle(
                                   fontFamily: 'Plus Jakarta Sans',
                                   fontSize: 14,
@@ -219,12 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const RegisterScreen(),
-                                    ),
-                                  );
+                                  Navigator.pop(context);
                                 },
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(
@@ -235,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 child: const Text(
-                                  'Daftar',
+                                  'Masuk',
                                   style: TextStyle(
                                     fontFamily: 'Plus Jakarta Sans',
                                     fontSize: 14,
@@ -256,11 +287,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ],
-      ),
-    );
+      );
+    },
+  ),
+);
   }
 }
-
-// ── Reusable Widgets ────────────────────────────────────────────────────────
-
-

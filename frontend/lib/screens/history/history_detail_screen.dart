@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import '../../models/history_model.dart';
+import '../invitations/edit_buwoh_screen.dart';
 
 class HistoryDetailScreen extends StatefulWidget {
+  final String eventId;
   final String nama;
   final String host;
   final String tanggal;
   final String lokasi;
   final String jenis;
-  final bool isAccepted;
+  final String status;
+  final List<ContributionModel> contributions;
 
   const HistoryDetailScreen({
     super.key,
+    required this.eventId,
     required this.nama,
     required this.host,
     required this.tanggal,
     required this.lokasi,
     required this.jenis,
-    required this.isAccepted,
+    required this.status,
+    required this.contributions,
   });
 
   @override
@@ -57,6 +63,66 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: widget.status == 'pending'
+          ? AnimatedSlide(
+              duration: const Duration(milliseconds: 300),
+              offset: _isBottomNavVisible ? Offset.zero : const Offset(0, 1),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.92),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF134231).withValues(alpha: 0.06),
+                      blurRadius: 40,
+                      offset: const Offset(0, -10),
+                    ),
+                  ],
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditBuwohScreen(
+                            eventId: widget.eventId,
+                            namaAcara: widget.nama,
+                          ),
+                        ),
+                      ).then((value) {
+                        if (value == true) {
+                          // Ideally we should pop or reload history. Since history fetches on focus, it might be fine to just pop.
+                          Navigator.pop(context, true);
+                        }
+                      });
+                    },
+                    icon: const Icon(Icons.edit_outlined, size: 22),
+                    label: const Text(
+                      'Edit Buwohan',
+                      style: TextStyle(
+                        fontFamily: 'Plus Jakarta Sans',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      elevation: 4,
+                      shadowColor: _primary.withValues(alpha: 0.2),
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : null,
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) {
           if (notification.direction == ScrollDirection.reverse) {
@@ -118,19 +184,23 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: widget.isAccepted
+                                  color: widget.status == 'attended' || widget.status == 'validated'
                                       ? Colors.green.withValues(alpha: 0.1)
-                                      : Colors.orange.withValues(alpha: 0.1),
+                                      : widget.status == 'rejected' 
+                                          ? Colors.red.withValues(alpha: 0.1) 
+                                          : Colors.orange.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  widget.isAccepted ? 'DITERIMA' : 'PENDING',
+                                  widget.status == 'attended' || widget.status == 'validated'
+                                      ? 'DITERIMA' 
+                                      : widget.status == 'rejected' ? 'DITOLAK' : 'PENDING',
                                   style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.bold,
-                                    color: widget.isAccepted
+                                    color: widget.status == 'attended' || widget.status == 'validated'
                                         ? Colors.green
-                                        : Colors.orange,
+                                        : widget.status == 'rejected' ? Colors.red : Colors.orange,
                                   ),
                                 ),
                               ),
@@ -192,16 +262,16 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: widget.isAccepted
+                    color: widget.status == 'attended' || widget.status == 'validated'
                         ? _primaryContainer
-                        : const Color(0xFFD97706),
+                        : widget.status == 'rejected' ? Colors.red : const Color(0xFFD97706),
                     borderRadius: BorderRadius.circular(999),
                     boxShadow: [
                       BoxShadow(
                         color:
-                            (widget.isAccepted
+                            (widget.status == 'attended' || widget.status == 'validated'
                                     ? _primaryContainer
-                                    : const Color(0xFFD97706))
+                                    : widget.status == 'rejected' ? Colors.red : const Color(0xFFD97706))
                                 .withValues(alpha: 0.3),
                         blurRadius: 16,
                         offset: const Offset(0, 4),
@@ -212,17 +282,17 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        widget.isAccepted
+                        widget.status == 'attended' || widget.status == 'validated'
                             ? Icons.check_circle
-                            : Icons.pending_actions,
+                            : widget.status == 'rejected' ? Icons.cancel : Icons.pending_actions,
                         color: Colors.white,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        widget.isAccepted
+                        widget.status == 'attended' || widget.status == 'validated'
                             ? 'Sudah Diterima'
-                            : 'Menunggu Verifikasi',
+                            : widget.status == 'rejected' ? 'Ditolak' : 'Menunggu Verifikasi',
                         style: const TextStyle(
                           fontFamily: 'Plus Jakarta Sans',
                           fontSize: 13,
@@ -253,26 +323,32 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                 ),
               ),
 
-              Row(
-                children: [
-                  // Uang
-                  Expanded(
+               Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: widget.contributions.map((c) {
+                  IconData icon = Icons.card_giftcard_outlined;
+                  String label = 'BARANG';
+                  if (c.type == 'uang') {
+                    icon = Icons.payments_outlined;
+                    label = 'UANG TUNAI';
+                  } else if (c.type == 'beras') {
+                    icon = Icons.inventory_2_outlined;
+                    label = 'BERAS';
+                  } else if (c.type == 'gula') {
+                    icon = Icons.kitchen_outlined;
+                    label = 'GULA';
+                  }
+
+                  return SizedBox(
+                    width: (MediaQuery.of(context).size.width - 52) / 2,
                     child: _KontribusiCard(
-                      icon: Icons.payments_outlined,
-                      label: 'UANG TUNAI',
-                      value: 'Rp 500.000',
+                      icon: icon,
+                      label: label,
+                      value: c.value,
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Barang
-                  Expanded(
-                    child: _KontribusiCard(
-                      icon: Icons.rice_bowl_outlined,
-                      label: 'BARANG',
-                      value: 'Beras: 5kg',
-                    ),
-                  ),
-                ],
+                  );
+                }).toList(),
               ),
             ],
           ),

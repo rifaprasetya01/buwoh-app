@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/widgets.dart';
-
+import '../../widgets/widgets.dart';
 
 /// Buwoh - Splash Screen
 class BuwohSplashScreen extends StatefulWidget {
@@ -190,5 +189,3 @@ class _BuwohSplashScreenState extends State<BuwohSplashScreen>
     );
   }
 }
-
-

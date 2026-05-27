@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import 'home_screen.dart';
-import '../widgets/widgets.dart';
+import 'package:provider/provider.dart';
+import 'register_screen.dart';
+import '../dashboard/home_screen.dart';
+import '../../widgets/widgets.dart';
+import '../../providers/auth_provider.dart';
+import '../../utils/buwoh_dialogs.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
-  final _nameCtrl = TextEditingController();
+class _LoginScreenState extends State<LoginScreen> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   bool _obscurePassword = true;
@@ -22,15 +24,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
   static const _primaryFixed = Color(0xFFBCEDD4);
   static const _secondaryFixed = Color(0xFFC5EBD9);
   static const _onSurfaceVariant = Color(0xFF414944);
+  // static const _outlineVariant = Color(0xFFC0C8C2);
+  // static const _outline = Color(0xFF717974);
   static const _surfaceContainerLowest = Color(0xFFFFFFFF);
   static const _background = Color(0xFFF8FAF8);
+  // static const _tertiary = Color(0xFF705D00);
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogin(BuildContext context, AuthProvider auth) async {
+    final success = await auth.login(
+      _emailCtrl.text.trim(),
+      _passwordCtrl.text,
+    );
+
+    if (!mounted) return;
+
+    // Navigation handled by AuthWrapper in main.dart
+    // But if we were pushed as a route, we should pop to return to the root
+    if (success) {
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+      return;
+    }
+
+    BuwohDialogs.showError(
+      context,
+      'Login gagal. Periksa email dan kata sandi Anda.',
+    );
   }
 
   @override
@@ -102,7 +129,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               const SizedBox(height: 8),
                               const Text(
-                                'Daftar Sekarang Juga',
+                                'Masuk ke Akun',
                                 style: TextStyle(
                                   fontFamily: 'Plus Jakarta Sans',
                                   fontSize: 16,
@@ -134,18 +161,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Name field
-                                const BuwohFieldLabel('Nama Lengkap'),
-                                const SizedBox(height: 8),
-                                BuwohInputField(
-                                  controller: _nameCtrl,
-                                  hintText: 'Masukkan nama lengkap',
-                                  prefixIcon: Icons.person_outline,
-                                  keyboardType: TextInputType.name,
-                                ),
-
-                                const SizedBox(height: 24),
-
                                 // Email field
                                 const BuwohFieldLabel('Email'),
                                 const SizedBox(height: 8),
@@ -169,17 +184,103 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
                                 ),
 
-                                const SizedBox(height: 32),
+                                const SizedBox(height: 12),
 
-                                // Register button
-                                BuwohPrimaryButton(
-                                  label: 'Daftar',
-                                  onPressed: () {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const HomeScreen(),
+                                // Forgot password
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Scaffold(
+                                            backgroundColor: _background,
+                                            appBar: AppBar(
+                                              backgroundColor: _background,
+                                              elevation: 0,
+                                              scrolledUnderElevation: 0,
+                                              leading: IconButton(
+                                                icon: const Icon(
+                                                  Icons.arrow_back,
+                                                  color: _primary,
+                                                ),
+                                                onPressed: () => Navigator.pop(context),
+                                              ),
+                                              title: const Text(
+                                                'Lupa Kata Sandi',
+                                                style: TextStyle(
+                                                  fontFamily: 'Plus Jakarta Sans',
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: _primary,
+                                                ),
+                                              ),
+                                            ),
+                                            body: Center(
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons.lock_reset_outlined,
+                                                    size: 64,
+                                                    color: _onSurfaceVariant.withValues(alpha: 0.5),
+                                                  ),
+                                                  const SizedBox(height: 16),
+                                                  const Text(
+                                                    'Fitur Segera Hadir!',
+                                                    style: TextStyle(
+                                                      fontFamily: 'Plus Jakarta Sans',
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight.w700,
+                                                      color: _primary,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  const Text(
+                                                    'Kami sedang menyiapkan sesuatu yang luar biasa.',
+                                                    style: TextStyle(
+                                                      fontFamily: 'Plus Jakarta Sans',
+                                                      fontSize: 13,
+                                                      color: _onSurfaceVariant,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: Size.zero,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: const Text(
+                                      'Lupa Kata Sandi?',
+                                      style: TextStyle(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: _primary,
+                                        letterSpacing: 0.3,
                                       ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 24),
+
+                                // Login button
+                                Consumer<AuthProvider>(
+                                  builder: (context, auth, _) {
+                                    return BuwohPrimaryButton(
+                                      label: auth.isLoading ? 'Memuat...' : 'Masuk',
+                                      onPressed: auth.isLoading 
+                                        ? null 
+                                        : () => _handleLogin(context, auth),
                                     );
                                   },
                                 ),
@@ -194,7 +295,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text(
-                                'Sudah punya akun?',
+                                'Belum punya akun?',
                                 style: TextStyle(
                                   fontFamily: 'Plus Jakarta Sans',
                                   fontSize: 14,
@@ -204,10 +305,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const LoginScreen(),
+                                      builder: (_) => const RegisterScreen(),
                                     ),
                                   );
                                 },
@@ -220,7 +321,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 child: const Text(
-                                  'Masuk',
+                                  'Daftar',
                                   style: TextStyle(
                                     fontFamily: 'Plus Jakarta Sans',
                                     fontSize: 14,
@@ -245,3 +346,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
+
+// ── Reusable Widgets ────────────────────────────────────────────────────────
+
+

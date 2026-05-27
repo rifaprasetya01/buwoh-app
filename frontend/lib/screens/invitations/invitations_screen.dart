@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/invitation_provider.dart';
+import '../../models/invitation_model.dart';
 import 'invitation_detail_screen.dart';
+import '../../config/api_config.dart';
 
 class InvitationsScreen extends StatefulWidget {
   const InvitationsScreen({super.key});
@@ -23,85 +27,26 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
 
   final _filters = ['Semua', 'Pernikahan', 'Khitanan', 'Tasyakuran'];
 
-  final _allInvitations = const [
-    _Invitation(
-      jenis: 'Undangan Pernikahan',
-      jenisColor: Color(0xFF705D00),
-      nama: 'Pernikahan Anisa & Bayu',
-      host: 'Bpk. Haji Sulaiman',
-      tanggal: 'Minggu, 24 Okt 2024',
-      waktu: '09.00 - 21.00 WIB',
-      lokasi: 'Griya Ageng, Solo',
-      lokasiDisplay: 'Griya Ageng, Solo • 2.4 km',
-      imageUrl:
-          'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=300',
-      isBalasBudi: true,
-      tag: 'Pernikahan',
-    ),
-    _Invitation(
-      jenis: 'Khitanan',
-      jenisColor: Color(0xFF134231),
-      nama: 'Syukuran Khitan Ahmad',
-      host: 'Keluarga Bpk. Bambang',
-      tanggal: 'Sabtu, 30 Okt 2024',
-      waktu: '08.00 - 13.00 WIB',
-      lokasi: 'Balai Desa Sukamaju',
-      lokasiDisplay: 'Balai Desa Sukamaju • 0.8 km',
-      imageUrl:
-          'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=300',
-      isBalasBudi: false,
-      tag: 'Khitanan',
-    ),
-    _Invitation(
-      jenis: 'Tasyakuran',
-      jenisColor: Color(0xFF134231),
-      nama: 'Tasyakuran Rumah Baru',
-      host: 'Ibu Retno & Keluarga',
-      tanggal: 'Jumat, 05 Nov 2024',
-      waktu: '10.00 - 14.00 WIB',
-      lokasi: 'Perum Elit Blok C-12',
-      lokasiDisplay: 'Perum Elit Blok C-12 • 5.1 km',
-      imageUrl:
-          'https://images.unsplash.com/photo-1555244162-803834f70033?w=300',
-      isBalasBudi: false,
-      tag: 'Tasyakuran',
-    ),
-    _Invitation(
-      jenis: 'Undangan Pernikahan',
-      jenisColor: Color(0xFF134231),
-      nama: 'Wedding of Rina & Andre',
-      host: 'Keluarga Bpk. Wijaya',
-      tanggal: 'Minggu, 07 Nov 2024',
-      waktu: '17.00 - 22.00 WIB',
-      lokasi: 'Grand Ballroom Hilton, Jakarta',
-      lokasiDisplay: 'Grand Ballroom Hilton • 12.0 km',
-      imageUrl:
-          'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=300',
-      isBalasBudi: false,
-      tag: 'Pernikahan',
-    ),
-  ];
-
-  List<_Invitation> get _filtered {
-    final query = _searchCtrl.text.toLowerCase();
-    var list = _allInvitations;
-    if (_selectedFilter != 0) {
-      list = list.where((i) => i.tag == _filters[_selectedFilter]).toList();
-    }
-    if (query.isNotEmpty) {
-      list = list
-          .where((i) =>
-              i.nama.toLowerCase().contains(query) ||
-              i.host.toLowerCase().contains(query))
-          .toList();
-    }
-    return list;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<InvitationProvider>(context, listen: false).fetchInvitations();
+    });
   }
 
   @override
   void dispose() {
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  void _onFilterChanged(int index) {
+    setState(() => _selectedFilter = index);
+    Provider.of<InvitationProvider>(context, listen: false).fetchInvitations(
+      search: _searchCtrl.text.isEmpty ? null : _searchCtrl.text,
+      type: _filters[index],
+    );
   }
 
   @override
@@ -126,7 +71,6 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
             letterSpacing: -0.3,
           ),
         ),
-
       ),
       body: Column(
         children: [
@@ -138,7 +82,12 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
                 // Search bar
                 TextField(
                   controller: _searchCtrl,
-                  onChanged: (_) => setState(() {}),
+                  onSubmitted: (val) {
+                    Provider.of<InvitationProvider>(context, listen: false).fetchInvitations(
+                      search: val.isEmpty ? null : val,
+                      type: _filters[_selectedFilter],
+                    );
+                  },
                   style: const TextStyle(
                     fontFamily: 'Plus Jakarta Sans',
                     fontSize: 14,
@@ -151,8 +100,11 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
                       fontSize: 14,
                       color: _outline,
                     ),
-                    prefixIcon: const Icon(Icons.search_outlined,
-                        color: _outline, size: 22),
+                    prefixIcon: const Icon(
+                      Icons.search_outlined,
+                      color: _outline,
+                      size: 22,
+                    ),
                     filled: true,
                     fillColor: _surfaceContainerLow,
                     border: OutlineInputBorder(
@@ -162,10 +114,14 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(999),
                       borderSide: BorderSide(
-                          color: _primary.withOpacity(0.2), width: 2),
+                        color: _primary.withValues(alpha: 0.2),
+                        width: 2,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
-                        vertical: 16, horizontal: 20),
+                      vertical: 16,
+                      horizontal: 20,
+                    ),
                   ),
                 ),
 
@@ -177,15 +133,17 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: _filters.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    separatorBuilder: (_, _) => const SizedBox(width: 8),
                     itemBuilder: (_, i) {
                       final selected = _selectedFilter == i;
                       return GestureDetector(
-                        onTap: () => setState(() => _selectedFilter = i),
+                        onTap: () => _onFilterChanged(i),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 8),
+                            horizontal: 20,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: selected
                                 ? _primaryContainer
@@ -214,14 +172,22 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
 
           // ── List ────────────────────────────────────────────────────────
           Expanded(
-            child: _filtered.isEmpty
-                ? Center(
+            child: Consumer<InvitationProvider>(
+              builder: (context, provider, _) {
+                if (provider.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (provider.invitations.isEmpty) {
+                  return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.search_off_outlined,
-                            size: 56,
-                            color: _outline.withValues(alpha: 0.4)),
+                        Icon(
+                          Icons.search_off_outlined,
+                          size: 56,
+                          color: _outline.withValues(alpha: 0.4),
+                        ),
                         const SizedBox(height: 12),
                         const Text(
                           'Tidak ada undangan ditemukan',
@@ -233,26 +199,36 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
                         ),
                       ],
                     ),
-                  )
-                : ListView.separated(
+                  );
+                }
+
+                return RefreshIndicator(
+                  onRefresh: () => provider.fetchInvitations(
+                    search: _searchCtrl.text.isEmpty ? null : _searchCtrl.text,
+                    type: _filters[_selectedFilter],
+                  ),
+                  child: ListView.separated(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-                    itemCount: _filtered.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 14),
+                    itemCount: provider.invitations.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 14),
                     itemBuilder: (_, i) {
-                      final inv = _filtered[i];
+                      final inv = provider.invitations[i];
                       return _InvitationCard(
                         invitation: inv,
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => InvitationDetailScreen(
-                              namaAcara: inv.nama,
-                              namaHost: inv.host,
-                              tanggal: inv.tanggal,
-                              waktu: inv.waktu,
-                              lokasi: inv.lokasi,
-                              jenis: inv.jenis.toUpperCase(),
-                              imageUrl: inv.imageUrl,
+                              eventId: inv.eventId,
+                              namaAcara: inv.title,
+                              namaHost: inv.hostName,
+                              tanggal: inv.date,
+                              waktu: inv.time,
+                              lokasi: inv.locationName,
+                              jenis: inv.type.toUpperCase(),
+                              imageUrl: inv.imageUrl.startsWith('http')
+                                  ? inv.imageUrl
+                                  : '${ApiConfig.baseUrl.replaceAll('/api/v1', '')}${inv.imageUrl}',
                               isPrioritas: inv.isBalasBudi,
                             ),
                           ),
@@ -260,6 +236,9 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
                       );
                     },
                   ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -267,38 +246,9 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
   }
 }
 
-// ── Data Model ───────────────────────────────────────────────────────────────
-class _Invitation {
-  final String jenis;
-  final Color jenisColor;
-  final String nama;
-  final String host;
-  final String tanggal;
-  final String waktu;
-  final String lokasi;
-  final String lokasiDisplay;
-  final String imageUrl;
-  final bool isBalasBudi;
-  final String tag;
-
-  const _Invitation({
-    required this.jenis,
-    required this.jenisColor,
-    required this.nama,
-    required this.host,
-    required this.tanggal,
-    required this.waktu,
-    required this.lokasi,
-    required this.lokasiDisplay,
-    required this.imageUrl,
-    required this.isBalasBudi,
-    required this.tag,
-  });
-}
-
 // ── Invitation Card ──────────────────────────────────────────────────────────
 class _InvitationCard extends StatelessWidget {
-  final _Invitation invitation;
+  final InvitationModel invitation;
   final VoidCallback onTap;
 
   static const _onSurface = Color(0xFF191C1B);
@@ -318,7 +268,7 @@ class _InvitationCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF191C1B).withOpacity(0.04),
+              color: const Color(0xFF191C1B).withValues(alpha: 0.04),
               blurRadius: 40,
               offset: const Offset(0, 10),
             ),
@@ -338,12 +288,17 @@ class _InvitationCard extends StatelessWidget {
                       width: 88,
                       height: 120,
                       child: Image.network(
-                        invitation.imageUrl,
+                        invitation.imageUrl.startsWith('http')
+                            ? invitation.imageUrl
+                            : '${ApiConfig.baseUrl.replaceAll('/api/v1', '')}${invitation.imageUrl}',
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Container(
                           color: const Color(0xFFE6E9E7),
-                          child: const Icon(Icons.image_outlined,
-                              color: Color(0xFFC0C8C2), size: 32),
+                          child: const Icon(
+                            Icons.image_outlined,
+                            color: Color(0xFFC0C8C2),
+                            size: 32,
+                          ),
                         ),
                       ),
                     ),
@@ -363,18 +318,18 @@ class _InvitationCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                invitation.jenis.toUpperCase(),
-                                style: TextStyle(
+                                invitation.type.toUpperCase(),
+                                style: const TextStyle(
                                   fontFamily: 'Plus Jakarta Sans',
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
-                                  color: invitation.jenisColor,
+                                  color: Color(0xFF134231),
                                   letterSpacing: 1.5,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                invitation.nama,
+                                invitation.title,
                                 style: const TextStyle(
                                   fontFamily: 'Plus Jakarta Sans',
                                   fontSize: 15,
@@ -385,7 +340,7 @@ class _InvitationCard extends StatelessWidget {
                               ),
                               const SizedBox(height: 3),
                               Text(
-                                invitation.host,
+                                invitation.hostName,
                                 style: const TextStyle(
                                   fontFamily: 'Plus Jakarta Sans',
                                   fontSize: 12,
@@ -400,11 +355,14 @@ class _InvitationCard extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  const Icon(Icons.calendar_today_outlined,
-                                      size: 13, color: _outline),
+                                  const Icon(
+                                    Icons.calendar_today_outlined,
+                                    size: 13,
+                                    color: _outline,
+                                  ),
                                   const SizedBox(width: 5),
                                   Text(
-                                    invitation.tanggal,
+                                    invitation.date,
                                     style: const TextStyle(
                                       fontFamily: 'Plus Jakarta Sans',
                                       fontSize: 11,
@@ -416,12 +374,34 @@ class _InvitationCard extends StatelessWidget {
                               const SizedBox(height: 4),
                               Row(
                                 children: [
-                                  const Icon(Icons.location_on_outlined,
-                                      size: 13, color: _outline),
+                                  const Icon(
+                                    Icons.access_time_outlined,
+                                    size: 13,
+                                    color: _outline,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    (invitation.time.isNotEmpty) ? invitation.time : '-',
+                                    style: const TextStyle(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      fontSize: 11,
+                                      color: _outline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on_outlined,
+                                    size: 13,
+                                    color: _outline,
+                                  ),
                                   const SizedBox(width: 5),
                                   Expanded(
                                     child: Text(
-                                      invitation.lokasiDisplay,
+                                      invitation.locationName + (invitation.distanceKm != null ? ' • ${invitation.distanceKm!.toStringAsFixed(1)} km' : ''),
                                       style: const TextStyle(
                                         fontFamily: 'Plus Jakarta Sans',
                                         fontSize: 11,
@@ -450,7 +430,9 @@ class _InvitationCard extends StatelessWidget {
                 left: 12,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 5),
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: _tertiaryFixed,
                     borderRadius: BorderRadius.circular(999),
@@ -458,10 +440,9 @@ class _InvitationCard extends StatelessWidget {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.favorite,
-                          size: 12, color: Color(0xFF221B00)),
+                      Icon(Icons.favorite, size: 12, color: Color(0xFF221B00)),
                       SizedBox(width: 4),
-                      Text(
+                      const Text(
                         'BALAS BUDI',
                         style: TextStyle(
                           fontFamily: 'Plus Jakarta Sans',

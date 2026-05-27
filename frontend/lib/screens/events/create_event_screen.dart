@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
+import '../../providers/events_provider.dart';
 import 'dart:ui';
+import '../../utils/buwoh_dialogs.dart';
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
@@ -15,9 +17,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   final _namaCtrl = TextEditingController();
   final _lokasiCtrl = TextEditingController();
   final _deskripsiCtrl = TextEditingController();
+  final _tipeAcaraLainnyaCtrl = TextEditingController();
+  final _mapLinkCtrl = TextEditingController();
+  
   DateTime? _tanggalMulai;
   TimeOfDay? _waktuMulai;
-  bool _isLoading = false;
+  TimeOfDay? _waktuSelesai;
+  String _tipeAcara = 'Pernikahan';
 
   bool _beras = true;
   bool _gula = false;
@@ -31,7 +37,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   static const _onSurface = Color(0xFF191C1B);
   static const _onSurfaceVariant = Color(0xFF414944);
   static const _surfaceContainerLow = Color(0xFFF2F4F2);
-  static const _surfaceContainerHigh = Color(0xFFE6E9E7);
+  // static const _surfaceContainerHigh = Color(0xFFE6E9E7);
   static const _surfaceContainerLowest = Color(0xFFFFFFFF);
   static const _tertiary = Color(0xFF705D00);
   static const _tertiaryFixed = Color(0xFFFFE16D);
@@ -43,6 +49,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     _namaCtrl.dispose();
     _lokasiCtrl.dispose();
     _deskripsiCtrl.dispose();
+    _tipeAcaraLainnyaCtrl.dispose();
+    _mapLinkCtrl.dispose();
     super.dispose();
   }
 
@@ -96,6 +104,25 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     if (picked != null) setState(() => _waktuMulai = picked);
   }
 
+  Future<void> _pickWaktuSelesai() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _waktuSelesai ?? (_waktuMulai ?? TimeOfDay.now()),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: _primaryContainer,
+            onPrimary: Colors.white,
+            surface: _surfaceContainerLowest,
+            onSurface: _onSurface,
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) setState(() => _waktuSelesai = picked);
+  }
+
   String _formatDate(DateTime? dt) {
     if (dt == null) return 'yyyy-mm-dd';
     return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
@@ -107,102 +134,72 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   Future<void> _submit() async {
+    debugPrint('--- SUBMIT EVENT STARTED ---');
+    final typeVal = _tipeAcara == 'Lainnya' ? _tipeAcaraLainnyaCtrl.text.trim() : _tipeAcara;
+    final mapLinkVal = _mapLinkCtrl.text.trim();
+
     // Validation
-    if (_namaCtrl.text.isEmpty ||
+    if (_namaCtrl.text.trim().isEmpty ||
         _tanggalMulai == null ||
         _waktuMulai == null ||
-        _lokasiCtrl.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sila lengkapi semua data acara'),
-          backgroundColor: Colors.orange,
-        ),
-      );
+        _waktuSelesai == null ||
+        _lokasiCtrl.text.trim().isEmpty ||
+        typeVal.isEmpty) {
+      debugPrint('Validation Failed: Some fields are empty');
+      BuwohDialogs.showWarning(context, 'Sila lengkapi semua data acara wajib');
       return;
     }
 
-    setState(() => _isLoading = true);
+    if (mapLinkVal.isNotEmpty && !mapLinkVal.startsWith('http://') && !mapLinkVal.startsWith('https://')) {
+      BuwohDialogs.showWarning(context, 'Link Google Maps harus diawali http:// atau https://');
+      return;
+    }
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
+    if (_waktuMulai != null && _waktuSelesai != null) {
+      final startTotalMinutes = _waktuMulai!.hour * 60 + _waktuMulai!.minute;
+      final endTotalMinutes = _waktuSelesai!.hour * 60 + _waktuSelesai!.minute;
+      
+      if (endTotalMinutes <= startTotalMinutes) {
+        BuwohDialogs.showWarning(context, 'Jam Selesai harus setelah Jam Mulai');
+        return;
+      }
+    }
+
+    debugPrint('Validation Passed. Fields: ${_namaCtrl.text}, ${_formatDate(_tanggalMulai)}, ${_formatTime(_waktuMulai)}, ${_formatTime(_waktuSelesai)}');
+    final eventsProvider = Provider.of<EventsProvider>(context, listen: false);
+    
+    final List<String> expected = [];
+    if (_beras) expected.add('beras');
+    if (_gula) expected.add('gula');
+    if (_uang) expected.add('uang');
+
+    final success = await eventsProvider.createEvent(
+      title: _namaCtrl.text.trim(),
+      type: typeVal,
+      date: _formatDate(_tanggalMulai),
+      startTime: _formatTime(_waktuMulai),
+      endTime: _formatTime(_waktuSelesai),
+      locationName: _lokasiCtrl.text.trim(),
+      mapLink: mapLinkVal.isEmpty ? null : mapLinkVal,
+      description: _deskripsiCtrl.text.trim(),
+      expectedContributions: expected,
+      coverImage: _fotoUndangan,
+    );
 
     if (!mounted) return;
-    setState(() => _isLoading = false);
 
-    // Show success dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFBCEDD4),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.check, color: _primary, size: 36),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Undangan Terbit!',
-                style: TextStyle(
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: _primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Acara Anda telah berhasil dibuat dan siap dibagikan.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontSize: 14,
-                  color: _onSurfaceVariant,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Close dialog
-                    Navigator.pop(context, {
-                      'nama': _namaCtrl.text,
-                      'tanggal': _formatDate(_tanggalMulai),
-                      'jenis': 'ACARA BARU',
-                      'fotoPath': _fotoUndangan?.path,
-                    }); // Go back home with new event data
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                  child: const Text('Kembali ke Beranda'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    if (success) {
+      // Show success dialog
+      await BuwohDialogs.showSuccess(context, 'Acara Anda telah berhasil dibuat dan siap dibagikan.');
+      if (mounted) Navigator.pop(context, true);
+    } else {
+      BuwohDialogs.showError(context, 'Gagal membuat acara. Silakan coba lagi.');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = Provider.of<EventsProvider>(context).isLoading;
     return Scaffold(
       backgroundColor: _background,
       extendBodyBehindAppBar: true,
@@ -306,18 +303,63 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
                   const SizedBox(height: 16),
 
+                  const _FieldLabel('TIPE ACARA'),
+                  const SizedBox(height: 8),
+                  _CustomDropdownField(
+                    value: _tipeAcara,
+                    items: const [
+                      'Pernikahan',
+                      'Khitanan',
+                      'Syukuran',
+                      'Ulang Tahun',
+                      'Pengajian',
+                      'Pertemuan',
+                      'Arisan',
+                      'Lainnya',
+                    ],
+                    onChanged: (val) {
+                      if (val != null) {
+                        setState(() {
+                          _tipeAcara = val;
+                        });
+                      }
+                    },
+                  ),
+
+                  if (_tipeAcara == 'Lainnya') ...[
+                    const SizedBox(height: 16),
+                    const _FieldLabel('TIPE ACARA KUSTOM'),
+                    const SizedBox(height: 8),
+                    _RoundedTextField(
+                      controller: _tipeAcaraLainnyaCtrl,
+                      hint: 'Contoh: Reuni Akbar',
+                    ),
+                  ],
+
+                  const SizedBox(height: 16),
+
+                  const _FieldLabel('TANGGAL ACARA'),
+                  const SizedBox(height: 8),
+                  _TapField(
+                    text: _formatDate(_tanggalMulai),
+                    hasValue: _tanggalMulai != null,
+                    onTap: _pickDateMulai,
+                  ),
+
+                  const SizedBox(height: 16),
+
                   Row(
                     children: [
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const _FieldLabel('TANGGAL'),
+                            const _FieldLabel('JAM MULAI'),
                             const SizedBox(height: 8),
                             _TapField(
-                              text: _formatDate(_tanggalMulai),
-                              hasValue: _tanggalMulai != null,
-                              onTap: _pickDateMulai,
+                              text: _formatTime(_waktuMulai),
+                              hasValue: _waktuMulai != null,
+                              onTap: _pickWaktuMulai,
                             ),
                           ],
                         ),
@@ -327,12 +369,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const _FieldLabel('WAKTU'),
+                            const _FieldLabel('JAM SELESAI'),
                             const SizedBox(height: 8),
                             _TapField(
-                              text: _formatTime(_waktuMulai),
-                              hasValue: _waktuMulai != null,
-                              onTap: _pickWaktuMulai,
+                              text: _formatTime(_waktuSelesai),
+                              hasValue: _waktuSelesai != null,
+                              onTap: _pickWaktuSelesai,
                             ),
                           ],
                         ),
@@ -546,7 +588,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const _FieldLabel('NAMA LOKASI / GEDUNG'),
+                        const SizedBox(height: 8),
                         TextField(
                           controller: _lokasiCtrl,
                           style: const TextStyle(
@@ -556,7 +601,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Cari alamat atau gedung...',
+                            hintText: 'Contoh: Gedung Serbaguna Desa...',
                             hintStyle: TextStyle(
                               fontFamily: 'Plus Jakarta Sans',
                               fontSize: 14,
@@ -565,6 +610,50 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             ),
                             prefixIcon: const Icon(
                               Icons.location_on,
+                              color: _primary,
+                            ),
+                            filled: true,
+                            fillColor: _surfaceContainerLow,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(999),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(999),
+                              borderSide: const BorderSide(
+                                color: _primaryContainer,
+                                width: 2,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 16,
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        const _FieldLabel('LINK PETA / GOOGLE MAPS (OPSIONAL)'),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _mapLinkCtrl,
+                          style: const TextStyle(
+                            fontFamily: 'Plus Jakarta Sans',
+                            fontSize: 14,
+                            color: _onSurface,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Contoh: https://maps.google.com/...',
+                            hintStyle: TextStyle(
+                              fontFamily: 'Plus Jakarta Sans',
+                              fontSize: 14,
+                              color: _onSurfaceVariant.withValues(alpha: 0.4),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.map,
                               color: _primary,
                             ),
                             filled: true,
@@ -697,7 +786,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _isLoading ? null : _submit,
+                onPressed: isLoading ? null : _submit,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _primaryContainer,
                   foregroundColor: Colors.white,
@@ -708,7 +797,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   elevation: 8,
                   shadowColor: _primaryContainer.withValues(alpha: 0.2),
                 ),
-                child: _isLoading
+                child: isLoading
                     ? const SizedBox(
                         height: 24,
                         width: 24,
@@ -734,6 +823,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       ),
               ),
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -927,6 +1017,51 @@ class _SumbanganItem extends StatelessWidget {
               inactiveTrackColor: const Color(0xFFE1E3E1),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CustomDropdownField extends StatelessWidget {
+  final String value;
+  final List<String> items;
+  final ValueChanged<String?> onChanged;
+
+  const _CustomDropdownField({
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF2F4F2),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF134231)),
+          style: const TextStyle(
+            fontFamily: 'Plus Jakarta Sans',
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF191C1B),
+          ),
+          dropdownColor: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          items: items.map((String item) {
+            return DropdownMenuItem<String>(
+              value: item,
+              child: Text(item),
+            );
+          }).toList(),
+          onChanged: onChanged,
         ),
       ),
     );
