@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buwoh App Logo Generator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&display=swap');
+
+        body {
+            background-color: #F8FAF8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .preview-text {
+            margin-bottom: 40px;
+            text-align: center;
+            color: #134231;
+        }
+
+        /* Ini adalah bentuk ikon yang meniru splash screen */
+        .icon-container {
+            width: 1024px;
+            height: 1024px;
+            background-color: #2D5A47;
+            border-radius: 50%;
+            /* Shadow menyesuaikan proporsi ukuran 1024px */
+            box-shadow: 0 128px 340px rgba(19, 66, 49, 0.20);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .icon-container svg {
+            width: 512px;
+            height: 512px;
+            fill: #FFFFFF;
+        }
+
+        /* Container untuk scaling tampilan agar muat di layar */
+        .scale-wrapper {
+            transform: scale(0.3);
+            transform-origin: center center;
+        }
+
+        .actions {
+            margin-top: -150px;
+            display: flex;
+            gap: 16px;
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color: #134231;
+            color: white;
+            border: none;
+            border-radius: 999px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: #2D5A47;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="preview-text">
+        <h1 style="margin: 0; font-size: 32px;">Logo Aplikasi Buwoh</h1>
+        <p style="margin: 8px 0 0 0; color: #414944;">Sesuai dengan desain Splash Screen</p>
+    </div>
+
+    <!-- Wrapper untuk mengecilkan tampilan (1024x1024 terlalu besar untuk layar) -->
+    <div class="scale-wrapper">
+        <!-- SVG Container (Elemen yang bisa disave/diexport) -->
+        <svg id="final-svg" xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+            <!-- Background Circle -->
+            <circle cx="512" cy="512" r="512" fill="#2D5A47" />
+            
+            <!-- Volunteer Activism Icon Path akan diinjeksi di sini dengan ukuran yang disesuaikan -->
+            <g id="icon-group" fill="#FFFFFF" transform="translate(256, 256) scale(21.333)"></g>
+        </svg>
+    </div>
+
+    <div class="actions">
+        <button onclick="downloadSVG()">Download SVG</button>
+        <button onclick="downloadPNG()" style="background-color: #705D00;">Download PNG</button>
+    </div>
+
+    <script>
+        // Fetch the raw material icon path for 'volunteer_activism'
+        fetch('https://unpkg.com/@material-design-icons/svg@0.14.2/filled/volunteer_activism.svg')
+            .then(res => res.text())
+            .then(svgText => {
+                // Ekstrak path d="..." dari raw SVG
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(svgText, "image/svg+xml");
+                const paths = doc.querySelectorAll('path');
+                
+                const group = document.getElementById('icon-group');
+                paths.forEach(p => {
+                    const newPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    newPath.setAttribute('d', p.getAttribute('d'));
+                    group.appendChild(newPath);
+                });
+            });
+
+        function downloadSVG() {
+            const svgElement = document.getElementById('final-svg');
+            const serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svgElement);
+
+            // Tambahkan xml namespace jika belum ada
+            if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+
+            // Convert ke blob URL
+            const blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
+            const url = URL.createObjectURL(blob);
+            
+            // Buat link download
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "buwoh_logo_1024.svg"; // Ini untuk SVG
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Fungsi baru khusus untuk mengekspor ke format PNG asli
+        function downloadPNG() {
+            const svgElement = document.getElementById('final-svg');
+            const serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svgElement);
+
+            if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+
+            const svgUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+            const canvas = document.createElement("canvas");
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+                const a = document.createElement("a");
+                a.download = "buwoh_logo_1024.png";
+                a.href = canvas.toDataURL("image/png");
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
+            img.src = svgUrl;
+        }
+    </script>
+</body>
+</html>

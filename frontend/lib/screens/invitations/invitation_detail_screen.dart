@@ -7,7 +7,7 @@ import '../../config/api_config.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/invitation_provider.dart';
 import '../../services/api_service.dart';
-import '../profile/profile_screen.dart';
+
 import 'edit_buwoh_screen.dart';
 import '../../utils/buwoh_dialogs.dart';
 import '../../providers/history_provider.dart';

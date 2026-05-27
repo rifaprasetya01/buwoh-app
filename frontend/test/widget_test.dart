@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:frontend/main.dart';
+import 'package:buwoh_app/main.dart';
 
 void main() {
   testWidgets('Splash screen shows Buwoh branding', (WidgetTester tester) async {

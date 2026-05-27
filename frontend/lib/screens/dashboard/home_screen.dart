@@ -464,14 +464,6 @@ class _HomeContentState extends State<_HomeContent> {
                                       color: AppColors.onSurface,
                                     ),
                                   ),
-                                  if (eventsProvider.returnFavorEvents.length >
-                                      2)
-                                    TextButton(
-                                      onPressed: () {
-                                        // TODO: Navigate to Return Favor specialized list if needed
-                                      },
-                                      child: const Text("Lihat Semua"),
-                                    ),
                                 ],
                               ),
                               const SizedBox(height: 16),

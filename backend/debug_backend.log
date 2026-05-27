@@ -256,3 +256,18 @@
 [2026-05-25T00:48:29.398Z] Fetching stats for userId: 01e2c7e2-612f-43e8-8e27-5d30e3d7ff99
 [2026-05-25T00:48:29.469Z] Stats for 01e2c7e2-612f-43e8-8e27-5d30e3d7ff99: totalBuwoh=1, totalEventsHosted=1
 [2026-05-25T00:48:29.471Z] Events found: [{"id":"a99ef4f4-20d4-4c68-8473-e151e635a6c4","title":"Lamaran Rina & Reza"}]
+[2026-05-27T11:06:34.646Z] Fetching stats for userId: 01e2c7e2-612f-43e8-8e27-5d30e3d7ff99
+[2026-05-27T11:06:34.729Z] Stats for 01e2c7e2-612f-43e8-8e27-5d30e3d7ff99: totalBuwoh=1, totalEventsHosted=1
+[2026-05-27T11:06:34.731Z] Events found: [{"id":"a99ef4f4-20d4-4c68-8473-e151e635a6c4","title":"Lamaran Rina & Reza"}]
+[2026-05-27T11:07:08.709Z] Fetching stats for userId: 93fb4b71-7853-4985-a1e3-9db7ed222d2c
+[2026-05-27T11:07:08.755Z] Stats for 93fb4b71-7853-4985-a1e3-9db7ed222d2c: totalBuwoh=0, totalEventsHosted=1
+[2026-05-27T11:07:08.756Z] Events found: [{"id":"79566d13-65af-4206-bec4-b3d6e3ab84da","title":"Acara Ulang Tahun Sinta"}]
+[2026-05-27T11:07:11.042Z] Fetching stats for userId: 93fb4b71-7853-4985-a1e3-9db7ed222d2c
+[2026-05-27T11:07:11.061Z] Stats for 93fb4b71-7853-4985-a1e3-9db7ed222d2c: totalBuwoh=0, totalEventsHosted=1
+[2026-05-27T11:07:11.063Z] Events found: [{"id":"79566d13-65af-4206-bec4-b3d6e3ab84da","title":"Acara Ulang Tahun Sinta"}]
+[2026-05-27T11:07:12.440Z] Fetching stats for userId: 93fb4b71-7853-4985-a1e3-9db7ed222d2c
+[2026-05-27T11:07:12.447Z] Stats for 93fb4b71-7853-4985-a1e3-9db7ed222d2c: totalBuwoh=0, totalEventsHosted=1
+[2026-05-27T11:07:12.449Z] Events found: [{"id":"79566d13-65af-4206-bec4-b3d6e3ab84da","title":"Acara Ulang Tahun Sinta"}]
+[2026-05-27T11:07:41.166Z] Fetching stats for userId: 82dc836c-d5f4-4f59-bc98-d7f18793e904
+[2026-05-27T11:07:41.217Z] Stats for 82dc836c-d5f4-4f59-bc98-d7f18793e904: totalBuwoh=0, totalEventsHosted=1
+[2026-05-27T11:07:41.219Z] Events found: [{"id":"2b1128b1-ffc1-41e1-891a-85f2fe391ea9","title":"Acara Pernikahan Andi dan Citra"}]

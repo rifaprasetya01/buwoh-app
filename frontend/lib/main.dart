@@ -32,7 +32,7 @@ class BuwohApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Buwoh',
+      title: 'Buwoh App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Plus Jakarta Sans',
